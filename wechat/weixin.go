@@ -91,6 +91,17 @@ type Wechat struct {
 	_tlsConfig         *tls.Config
 }
 
+//New 创建wechat
+func New(Appid, Appsecret, Token, Encodingaeskey string) *Wechat {
+	wx := &Wechat{
+		Appid:          Appid,
+		Appsecret:      Appsecret,
+		Token:          Token,
+		Encodingaeskey: Encodingaeskey,
+	}
+	return wx
+}
+
 //GetAccessToken 获取 access_token
 func (wx *Wechat) GetAccessToken() (err error) {
 	if wx.Appsecret == "" {
