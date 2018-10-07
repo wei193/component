@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"time"
-	"wechat-3rd/component/wechat"
+
+	"github.com/wei193/component/wechat"
 )
 
 //Authorizer Authorizer
