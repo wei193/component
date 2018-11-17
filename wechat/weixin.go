@@ -1,9 +1,11 @@
 package wechat
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -88,7 +90,17 @@ type Wechat struct {
 	AccessTokenExpires int64
 	JsapiTicket        string
 	JsapiTokenTime     int64
-	_tlsConfig         *tls.Config
+	mch                *MchInfo
+}
+
+//MchInfo 微信商户信息
+type MchInfo struct {
+	MchID      string
+	PayKey     string
+	CertPath   string
+	KeyPath    string
+	CaPath     string
+	_tlsConfig *tls.Config
 }
 
 //New 创建wechat
@@ -100,6 +112,20 @@ func New(Appid, Appsecret, Token, Encodingaeskey string) *Wechat {
 		Encodingaeskey: Encodingaeskey,
 	}
 	return wx
+}
+
+//SetMch 设置商户
+func (wx *Wechat) SetMch(mchid, paykey, certpath, keypath, capath string) {
+	if wx.mch == nil {
+		wx.mch = &MchInfo{
+			MchID:  mchid,
+			PayKey: paykey,
+		}
+	} else {
+		wx.mch.MchID = mchid
+		wx.mch.PayKey = paykey
+	}
+	wx.mch._tlsConfig, _ = getTLSConfig(certpath, keypath, capath)
 }
 
 //GetAccessToken 获取 access_token
@@ -412,38 +438,35 @@ func RandomStr(size int, Random int) string {
 	return string(result)
 }
 
-// func (wx *Wechat) getTLSConfig() (*tls.Config, error) {
-// 	if wx._tlsConfig != nil {
-// 		return wx._tlsConfig, nil
-// 	}
-// 	cert, err := tls.LoadX509KeyPair(wx.Option["CertPath"], wx.Option["KeyPath"])
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func getTLSConfig(certpath, keypath, capath string) (*tls.Config, error) {
 
-// 	caData, err := ioutil.ReadFile(wx.Option["CaPath"])
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	pool := x509.NewCertPool()
-// 	pool.AppendCertsFromPEM(caData)
+	cert, err := tls.LoadX509KeyPair(certpath, keypath)
+	if err != nil {
+		return nil, err
+	}
 
-// 	wx._tlsConfig = &tls.Config{
-// 		Certificates: []tls.Certificate{cert},
-// 		RootCAs:      pool,
-// 	}
-// 	return wx._tlsConfig, nil
-// }
+	caData, err := ioutil.ReadFile(capath)
+	if err != nil {
+		return nil, err
+	}
+	pool := x509.NewCertPool()
+	pool.AppendCertsFromPEM(caData)
 
-// //httpsPost  HttpsPost请求
-// func (wx *Wechat) httpsPost(url string, xmlContent []byte, ContentType string) (*http.Response, error) {
-// 	tlsConfig, err := wx.getTLSConfig()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	tr := &http.Transport{TLSClientConfig: tlsConfig}
-// 	client := &http.Client{Transport: tr}
-// 	return client.Post(url,
-// 		ContentType,
-// 		bytes.NewBuffer(xmlContent))
-// }
+	return &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      pool,
+	}, nil
+}
+
+//httpsPost  HttpsPost请求
+func (wx *Wechat) httpsPost(url string, xmlContent []byte, ContentType string) (*http.Response, error) {
+	tlsConfig := wx.mch._tlsConfig
+	if tlsConfig == nil {
+		return nil, errors.New("init tls Config Error")
+	}
+	tr := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: tr}
+	return client.Post(url,
+		ContentType,
+		bytes.NewBuffer(xmlContent))
+}

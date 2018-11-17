@@ -1,7 +1,14 @@
 package wechat
 
 import (
+	"bytes"
 	"encoding/xml"
+	"errors"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/wei193/wechat"
 )
 
 //baseurl
@@ -157,128 +164,178 @@ type ReqDownloadBill struct {
 	Sign     string   `xml:"sign"`
 }
 
-// //UnifiedOrder 支付下单https://api.mch.weixin.qq.com/pay/unifiedorder
-// func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err error) {
-// 	order.Sign = XMLSignMd5(order, wx.Option["pay_key"])
-// 	d, _ := xml.MarshalIndent(order, "", "\t")
-// 	// base.PAYLOG.Info("unifiedorder send ", string(d))
-// 	req, err := http.NewRequest("POST", URLPAYUNIFIEDORDER, bytes.NewReader(d))
-// 	resBody, err := wx.requsetXML(req, -1)
-// 	// base.PAYLOG.Info("unifiedorder recv ", string(resBody))
-// 	if err != nil {
-// 		return data, err
-// 	}
-// 	err = xml.Unmarshal(resBody, &data)
-// 	if err != nil {
-// 		return data, err
-// 	}
-// 	Sign := data.Sign
-// 	data.Sign = ""
-// 	if XMLSignMd5(data, wx.Option["pay_key"]) != Sign {
-// 		return data, errors.New("签名错误")
-// 	}
-// 	return data, nil
-// }
+//TPaySign TPaySign
+type TPaySign struct {
+	AppID     string `xml:"appId" json:"appId"`
+	Timestamp int64  `xml:"timeStamp" json:"timeStamp"`
+	NonceStr  string `xml:"nonceStr" json:"nonceStr"`
+	Package   string `xml:"package" json:"package"`
+	SignType  string `xml:"signType" json:"signType"`
+	PaySign   string `xml:"paySign" json:"paySign"`
+}
 
-// //QueryOrder 查询订单https://api.mch.weixin.qq.com/pay/orderquery
-// func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrder, err error) {
+//TAPPPaySign TAPPPaySign
+type TAPPPaySign struct {
+	AppID     string `xml:"appid" json:"appid"`
+	Partnerid string `xml:"partnerid" json:"partnerid"`
+	Prepayid  string `xml:"prepayid" json:"prepayid"`
+	Package   string `xml:"package" json:"package"`
+	NonceStr  string `xml:"noncestr" json:"noncestr"`
+	Timestamp int64  `xml:"timestamp" json:"timestamp"`
+	PaySign   string `xml:"sign" json:"sign"`
+}
 
-// 	queryOrder := ReqQueryOrder{
-// 		Appid:         wx.Appid,
-// 		Mchid:         wx.Option["mch_id"],
-// 		Transactionid: transactionid,
-// 		OutTradeNo:    outTradeNo,
-// 		Noncestr:      RandomStr(20, 3)}
+//UnifiedOrder 支付下单https://api.mch.weixin.qq.com/pay/unifiedorder
+func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err error) {
+	order.Appid = wx.Appid
+	order.Mchid = wx.mch.MchID
+	order.Sign = XMLSignMd5(order, wx.mch.PayKey)
+	d, _ := xml.MarshalIndent(order, "", "\t")
+	// base.PAYLOG.Info("unifiedorder send ", string(d))
+	req, err := http.NewRequest("POST", URLPAYUNIFIEDORDER, bytes.NewReader(d))
+	resBody, err := requsetXML(req, -1)
+	// base.PAYLOG.Info("unifiedorder recv ", string(resBody))
+	if err != nil {
+		return data, err
+	}
+	err = xml.Unmarshal(resBody, &data)
+	if err != nil {
+		return data, err
+	}
+	Sign := data.Sign
+	data.Sign = ""
+	if XMLSignMd5(data, wx.mch.PayKey) != Sign {
+		return data, errors.New("签名错误")
+	}
+	return data, nil
+}
 
-// 	queryOrder.Sign = XMLSignMd5(queryOrder, wx.Option["pay_key"])
-// 	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
-// 	req, err := http.NewRequest("POST", URLPAYORDERQUERY, bytes.NewReader(d))
-// 	resBody, err := wx.requsetXML(req, -1)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return data, err
-// 	}
-// 	err = xml.Unmarshal(resBody, &data)
-// 	if err != nil {
-// 		return data, err
-// 	}
-// 	Sign := data.Sign
-// 	data.Sign = ""
-// 	if XMLSignMd5(data, wx.Option["pay_key"]) != Sign {
-// 		return data, errors.New("签名错误")
-// 	}
-// 	return data, nil
-// }
+//QueryOrder 查询订单https://api.mch.weixin.qq.com/pay/orderquery
+func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrder, err error) {
 
-// //CloseOrder 关闭订单https://api.mch.weixin.qq.com/pay/closeorder
-// func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) {
-// 	queryOrder := ReqQueryOrder{
-// 		Appid:      wx.Appid,
-// 		Mchid:      wx.Option["mch_id"],
-// 		OutTradeNo: outTradeNo,
-// 		Noncestr:   RandomStr(20, 3)}
-// 	queryOrder.Sign = XMLSignMd5(queryOrder, wx.Option["pay_key"])
-// 	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
-// 	req, err := http.NewRequest("POST", URLPAYCLOSEORDER, bytes.NewReader(d))
-// 	resBody, err := wx.requsetXML(req, -1)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return data, err
-// 	}
-// 	err = xml.Unmarshal(resBody, &data)
-// 	if err != nil {
-// 		return data, err
-// 	}
-// 	Sign := data.Sign
-// 	data.Sign = ""
-// 	if XMLSignMd5(data, wx.Option["pay_key"]) != Sign {
-// 		return data, errors.New("签名错误")
-// 	}
-// 	return data, nil
-// }
+	queryOrder := ReqQueryOrder{
+		Appid:         wx.Appid,
+		Mchid:         wx.mch.MchID,
+		Transactionid: transactionid,
+		OutTradeNo:    outTradeNo,
+		Noncestr:      RandomStr(20, 3)}
 
-// //Refund 申请退款https://api.mch.weixin.qq.com/secapi/pay/refund
-// func (wx *Wechat) Refund() {
+	queryOrder.Sign = XMLSignMd5(queryOrder, wx.mch.PayKey)
+	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
+	req, err := http.NewRequest("POST", URLPAYORDERQUERY, bytes.NewReader(d))
+	resBody, err := requsetXML(req, -1)
+	if err != nil {
+		log.Println(err)
+		return data, err
+	}
+	err = xml.Unmarshal(resBody, &data)
+	if err != nil {
+		return data, err
+	}
+	Sign := data.Sign
+	data.Sign = ""
+	if XMLSignMd5(data, wx.mch.PayKey) != Sign {
+		return data, errors.New("签名错误")
+	}
+	return data, nil
+}
 
-// }
+//CloseOrder 关闭订单https://api.mch.weixin.qq.com/pay/closeorder
+func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) {
+	queryOrder := ReqQueryOrder{
+		Appid:      wx.Appid,
+		Mchid:      wx.mch.MchID,
+		OutTradeNo: outTradeNo,
+		Noncestr:   RandomStr(20, 3)}
+	queryOrder.Sign = XMLSignMd5(queryOrder, wx.mch.PayKey)
+	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
+	req, err := http.NewRequest("POST", URLPAYCLOSEORDER, bytes.NewReader(d))
+	resBody, err := requsetXML(req, -1)
+	if err != nil {
+		log.Println(err)
+		return data, err
+	}
+	err = xml.Unmarshal(resBody, &data)
+	if err != nil {
+		return data, err
+	}
+	Sign := data.Sign
+	data.Sign = ""
+	if XMLSignMd5(data, wx.mch.PayKey) != Sign {
+		return data, errors.New("签名错误")
+	}
+	return data, nil
+}
 
-// //Downloadbill 下载对账单https://api.mch.weixin.qq.com/pay/downloadbill
-// func (wx *Wechat) Downloadbill(billDate string, billType string) (data string, err error) {
-// 	queryBill := ReqDownloadBill{
-// 		Appid:    wx.Appid,
-// 		Mchid:    wx.Option["mch_id"],
-// 		BiilDate: billDate,
-// 		BillType: billType,
-// 		Noncestr: RandomStr(20, 3)}
-// 	queryBill.Sign = XMLSignMd5(queryBill, wx.Option["pay_key"])
-// 	d, _ := xml.MarshalIndent(queryBill, "", "\t")
-// 	req, err := http.NewRequest("POST", URLDOWNLOADBILL, bytes.NewReader(d))
-// 	resBody, err := wx.requsetXML(req, -1, false)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return "", err
-// 	}
-// 	// log.Println(string(resBody))
-// 	return string(resBody), nil
-// }
+//Refund 申请退款https://api.mch.weixin.qq.com/secapi/pay/refund
+func (wx *Wechat) Refund() {
 
-// //SendHongbao 发送红包
-// func (wx *Wechat) SendHongbao(hb ReqHongbao) (resp ResHongbao, err error) {
-// 	hb.Sign = XMLSignMd5(hb, wx.Option["pay_key"])
-// 	data, err := xml.MarshalIndent(&hb, "", " ")
-// 	if err != nil {
-// 		return resp, err
-// 	}
-// 	res, err := wx.httpsPost("https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack", data, "text/xml")
-// 	if err != nil {
-// 		log.Println(res, err)
-// 		return resp, err
-// 	}
-// 	resBody := make([]byte, 1024)
-// 	res.Body.Read(resBody)
-// 	err = xml.Unmarshal(resBody, &resp)
-// 	if err != nil {
-// 		return resp, err
-// 	}
-// 	return resp, nil
-// }
+}
+
+//Downloadbill 下载对账单https://api.mch.weixin.qq.com/pay/downloadbill
+func (wx *Wechat) Downloadbill(billDate string, billType string) (data string, err error) {
+	queryBill := ReqDownloadBill{
+		Appid:    wx.Appid,
+		Mchid:    wx.mch.MchID,
+		BiilDate: billDate,
+		BillType: billType,
+		Noncestr: RandomStr(20, 3)}
+	queryBill.Sign = XMLSignMd5(queryBill, wx.mch.PayKey)
+	d, _ := xml.MarshalIndent(queryBill, "", "\t")
+	req, err := http.NewRequest("POST", URLDOWNLOADBILL, bytes.NewReader(d))
+	resBody, err := requsetXML(req, -1, false)
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	// log.Println(string(resBody))
+	return string(resBody), nil
+}
+
+//SendHongbao 发送红包
+func (wx *Wechat) SendHongbao(hb ReqHongbao) (resp ResHongbao, err error) {
+	hb.Sign = XMLSignMd5(hb, wx.mch.PayKey)
+	data, err := xml.MarshalIndent(&hb, "", " ")
+	if err != nil {
+		return resp, err
+	}
+	res, err := wx.httpsPost("https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack", data, "text/xml")
+	if err != nil {
+		log.Println(res, err)
+		return resp, err
+	}
+	resBody := make([]byte, 1024)
+	res.Body.Read(resBody)
+	err = xml.Unmarshal(resBody, &resp)
+	if err != nil {
+		return resp, err
+	}
+	return resp, nil
+}
+
+//CreatePaySign 创建PaySign
+func (wx *Wechat) CreatePaySign(prepayid string) (data TPaySign) {
+	data = TPaySign{
+		AppID:     wx.Appid,
+		Timestamp: time.Now().Unix(),
+		NonceStr:  wechat.RandomStr(20, 3),
+		Package:   "prepay_id=" + prepayid,
+		SignType:  "MD5",
+	}
+	data.PaySign = XMLSignMd5(data, wx.mch.PayKey)
+	return
+}
+
+//CreateAPPPaySign 创建APPPaySign
+func (wx *Wechat) CreateAPPPaySign(prepayid string) (data TAPPPaySign) {
+	data = TAPPPaySign{
+		AppID:     wx.Appid,
+		Partnerid: wx.mch.MchID,
+		Prepayid:  prepayid,
+		Package:   "Sign=WXPay",
+		NonceStr:  wechat.RandomStr(20, 3),
+		Timestamp: time.Now().Unix(),
+	}
+	data.PaySign = XMLSignMd5(data, wx.mch.PayKey)
+	return
+}
