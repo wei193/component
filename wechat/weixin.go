@@ -90,7 +90,7 @@ type Wechat struct {
 	AccessTokenExpires int64
 	JsapiTicket        string
 	JsapiTokenTime     int64
-	mch                *MchInfo
+	Mch                *MchInfo
 }
 
 //MchInfo 微信商户信息
@@ -116,16 +116,16 @@ func New(Appid, Appsecret, Token, Encodingaeskey string) *Wechat {
 
 //SetMch 设置商户
 func (wx *Wechat) SetMch(mchid, paykey, certpath, keypath, capath string) {
-	if wx.mch == nil {
-		wx.mch = &MchInfo{
+	if wx.Mch == nil {
+		wx.Mch = &MchInfo{
 			MchID:  mchid,
 			PayKey: paykey,
 		}
 	} else {
-		wx.mch.MchID = mchid
-		wx.mch.PayKey = paykey
+		wx.Mch.MchID = mchid
+		wx.Mch.PayKey = paykey
 	}
-	wx.mch._tlsConfig, _ = getTLSConfig(certpath, keypath, capath)
+	wx.Mch._tlsConfig, _ = getTLSConfig(certpath, keypath, capath)
 }
 
 //GetAccessToken 获取 access_token
@@ -460,7 +460,7 @@ func getTLSConfig(certpath, keypath, capath string) (*tls.Config, error) {
 
 //httpsPost  HttpsPost请求
 func (wx *Wechat) httpsPost(url string, xmlContent []byte, ContentType string) (*http.Response, error) {
-	tlsConfig := wx.mch._tlsConfig
+	tlsConfig := wx.Mch._tlsConfig
 	if tlsConfig == nil {
 		return nil, errors.New("init tls Config Error")
 	}

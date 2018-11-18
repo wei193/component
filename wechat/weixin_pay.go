@@ -188,8 +188,8 @@ type TAPPPaySign struct {
 //UnifiedOrder 支付下单https://api.mch.weixin.qq.com/pay/unifiedorder
 func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err error) {
 	order.Appid = wx.Appid
-	order.Mchid = wx.mch.MchID
-	order.Sign = XMLSignMd5(order, wx.mch.PayKey)
+	order.Mchid = wx.Mch.MchID
+	order.Sign = XMLSignMd5(order, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(order, "", "\t")
 	// base.PAYLOG.Info("unifiedorder send ", string(d))
 	req, err := http.NewRequest("POST", URLPAYUNIFIEDORDER, bytes.NewReader(d))
@@ -204,7 +204,7 @@ func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err
 	}
 	Sign := data.Sign
 	data.Sign = ""
-	if XMLSignMd5(data, wx.mch.PayKey) != Sign {
+	if XMLSignMd5(data, wx.Mch.PayKey) != Sign {
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -215,12 +215,12 @@ func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrd
 
 	queryOrder := ReqQueryOrder{
 		Appid:         wx.Appid,
-		Mchid:         wx.mch.MchID,
+		Mchid:         wx.Mch.MchID,
 		Transactionid: transactionid,
 		OutTradeNo:    outTradeNo,
 		Noncestr:      RandomStr(20, 3)}
 
-	queryOrder.Sign = XMLSignMd5(queryOrder, wx.mch.PayKey)
+	queryOrder.Sign = XMLSignMd5(queryOrder, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
 	req, err := http.NewRequest("POST", URLPAYORDERQUERY, bytes.NewReader(d))
 	resBody, err := requsetXML(req, -1)
@@ -234,7 +234,7 @@ func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrd
 	}
 	Sign := data.Sign
 	data.Sign = ""
-	if XMLSignMd5(data, wx.mch.PayKey) != Sign {
+	if XMLSignMd5(data, wx.Mch.PayKey) != Sign {
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -244,10 +244,10 @@ func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrd
 func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) {
 	queryOrder := ReqQueryOrder{
 		Appid:      wx.Appid,
-		Mchid:      wx.mch.MchID,
+		Mchid:      wx.Mch.MchID,
 		OutTradeNo: outTradeNo,
 		Noncestr:   RandomStr(20, 3)}
-	queryOrder.Sign = XMLSignMd5(queryOrder, wx.mch.PayKey)
+	queryOrder.Sign = XMLSignMd5(queryOrder, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
 	req, err := http.NewRequest("POST", URLPAYCLOSEORDER, bytes.NewReader(d))
 	resBody, err := requsetXML(req, -1)
@@ -261,7 +261,7 @@ func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) 
 	}
 	Sign := data.Sign
 	data.Sign = ""
-	if XMLSignMd5(data, wx.mch.PayKey) != Sign {
+	if XMLSignMd5(data, wx.Mch.PayKey) != Sign {
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -276,11 +276,11 @@ func (wx *Wechat) Refund() {
 func (wx *Wechat) Downloadbill(billDate string, billType string) (data string, err error) {
 	queryBill := ReqDownloadBill{
 		Appid:    wx.Appid,
-		Mchid:    wx.mch.MchID,
+		Mchid:    wx.Mch.MchID,
 		BiilDate: billDate,
 		BillType: billType,
 		Noncestr: RandomStr(20, 3)}
-	queryBill.Sign = XMLSignMd5(queryBill, wx.mch.PayKey)
+	queryBill.Sign = XMLSignMd5(queryBill, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(queryBill, "", "\t")
 	req, err := http.NewRequest("POST", URLDOWNLOADBILL, bytes.NewReader(d))
 	resBody, err := requsetXML(req, -1, false)
@@ -294,7 +294,7 @@ func (wx *Wechat) Downloadbill(billDate string, billType string) (data string, e
 
 //SendHongbao 发送红包
 func (wx *Wechat) SendHongbao(hb ReqHongbao) (resp ResHongbao, err error) {
-	hb.Sign = XMLSignMd5(hb, wx.mch.PayKey)
+	hb.Sign = XMLSignMd5(hb, wx.Mch.PayKey)
 	data, err := xml.MarshalIndent(&hb, "", " ")
 	if err != nil {
 		return resp, err
@@ -322,7 +322,7 @@ func (wx *Wechat) CreatePaySign(prepayid string) (data TPaySign) {
 		Package:   "prepay_id=" + prepayid,
 		SignType:  "MD5",
 	}
-	data.PaySign = XMLSignMd5(data, wx.mch.PayKey)
+	data.PaySign = XMLSignMd5(data, wx.Mch.PayKey)
 	return
 }
 
@@ -330,12 +330,12 @@ func (wx *Wechat) CreatePaySign(prepayid string) (data TPaySign) {
 func (wx *Wechat) CreateAPPPaySign(prepayid string) (data TAPPPaySign) {
 	data = TAPPPaySign{
 		AppID:     wx.Appid,
-		Partnerid: wx.mch.MchID,
+		Partnerid: wx.Mch.MchID,
 		Prepayid:  prepayid,
 		Package:   "Sign=WXPay",
 		NonceStr:  wechat.RandomStr(20, 3),
 		Timestamp: time.Now().Unix(),
 	}
-	data.PaySign = XMLSignMd5(data, wx.mch.PayKey)
+	data.PaySign = XMLSignMd5(data, wx.Mch.PayKey)
 	return
 }
