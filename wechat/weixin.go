@@ -161,8 +161,8 @@ func (wx *Wechat) GetAccessToken() (err error) {
 	return nil
 }
 
-//检查微信access_token有效性
-func (wx *Wechat) checkAccessToken() int {
+//CheckAccessToken 检查微信access_token有效性
+func (wx *Wechat) CheckAccessToken() int {
 	req, err := http.NewRequest("GET", URLGETCALLBACKIP+"?access_token="+
 		wx.AccessToken, nil)
 	_, err = requsetJSON(req, 0)
@@ -172,8 +172,8 @@ func (wx *Wechat) checkAccessToken() int {
 	return 1
 }
 
-//获取js的jsapi_ticket
-func (wx *Wechat) getJsapiTicket() int {
+//GetJsapiTicket 获取js的jsapi_ticket
+func (wx *Wechat) GetJsapiTicket() int {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["type"] = "jsapi"
