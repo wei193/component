@@ -90,6 +90,7 @@ type Wechat struct {
 	AccessTokenExpires int64
 	JsapiTicket        string
 	JsapiTokenTime     int64
+	JsapiTokenExpires  int64
 	Mch                *MchInfo
 }
 
@@ -192,6 +193,7 @@ func (wx *Wechat) GetJsapiTicket() int {
 	} else if tmpTick.Errcode == 0 {
 		wx.JsapiTokenTime = time.Now().Unix()
 		wx.JsapiTicket = tmpTick.Ticket
+		wx.JsapiTokenExpires = time.Now().Unix() + int64(tmpTick.Expiresin)
 		return 1
 	}
 	return 0
