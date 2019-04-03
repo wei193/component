@@ -8,8 +8,6 @@ import (
 	"log"
 	"strings"
 	"time"
-
-	"github.com/astaxie/beego"
 )
 
 //Component 第三平台信息
@@ -59,7 +57,6 @@ func NewComponent(appid, appsecret, token, aeskey, verifyticket, accesstoken str
 
 	AESKey, err := base64.StdEncoding.DecodeString(aeskey + "=")
 	if err != nil {
-		beego.Error("Component Init Error")
 		return nil, err
 	}
 
@@ -125,7 +122,6 @@ func (c *Component) AuthEventTicket(msg, signature, timestamp, nonce string) (ev
 	event = new(XCEvent)
 	err = xml.Unmarshal([]byte(result[s:e+1]), event)
 	if err != nil {
-		beego.Error(err)
 		return nil, errors.New("xml Unmarshal Error")
 	}
 	switch event.InfoType {
