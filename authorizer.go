@@ -10,12 +10,12 @@ import (
 
 //Authorizer Authorizer
 type Authorizer struct {
-	Component              *Component
-	AuthorizerAppid        string
-	AuthorizerAccessToken  string
-	AccessTokenExpires     int64
+	*wechat.Wechat
+	Component *Component
+	// AuthorizerAppid        string
+	// AuthorizerAccessToken  string
+	// AccessTokenExpires     int64
 	AuthorizerRefreshToken string
-	Weixin                 *wechat.Wechat
 }
 
 //JAuthorizer 授权信息
@@ -90,12 +90,12 @@ type JUserAccessToken struct {
 //NewAuthorizer 新建Authorizer
 func (c *Component) NewAuthorizer(appid, accesstoken string, tokenexpires int64, refreshtoken string) (authorizer *Authorizer, err error) {
 	authorizer = &Authorizer{
-		Component:              c,
-		AuthorizerAppid:        appid,
-		AuthorizerAccessToken:  accesstoken,
-		AccessTokenExpires:     tokenexpires,
+		Component: c,
+		// AuthorizerAppid:        appid,
+		// AuthorizerAccessToken:  accesstoken,
+		// AccessTokenExpires:     tokenexpires,
 		AuthorizerRefreshToken: refreshtoken,
-		Weixin: &wechat.Wechat{
+		Wechat: &wechat.Wechat{
 			Appid:              appid,
 			AccessToken:        accesstoken,
 			AccessTokenExpires: tokenexpires,
@@ -112,7 +112,7 @@ func (a *Authorizer) GetAuthorizerInfo() (authorizer *JAuthorizer, err error) {
 	}
 	d := st{
 		ComponentAppid:  a.Component.ComponentAppid,
-		AuthorizerAppid: a.AuthorizerAppid,
+		AuthorizerAppid: a.Wechat.Appid,
 	}
 	req, err := createRequset("https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token="+a.Component.ComponentAccessToken,
 		"POST", nil, d)
@@ -142,7 +142,7 @@ func (a *Authorizer) GetAuthorizerAccessToken() (token *JAuthorizerAccessToken, 
 	}
 	d := st{
 		ComponentAppid:         a.Component.ComponentAppid,
-		AuthorizerAppid:        a.AuthorizerAppid,
+		AuthorizerAppid:        a.Appid,
 		AuthorizerRefreshToken: a.AuthorizerRefreshToken,
 	}
 	req, err := createRequset("https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token="+a.Component.ComponentAccessToken,
@@ -160,7 +160,7 @@ func (a *Authorizer) GetAuthorizerAccessToken() (token *JAuthorizerAccessToken, 
 	if err != nil {
 		return nil, err
 	}
-	a.AuthorizerAccessToken = token.AuthorizerAccessToken
+	a.AccessToken = token.AuthorizerAccessToken
 	a.AuthorizerRefreshToken = token.AuthorizerRefreshToken
 	a.AccessTokenExpires = time.Now().Unix() + int64(token.ExpiresIn)
 	return token, nil
@@ -169,7 +169,7 @@ func (a *Authorizer) GetAuthorizerAccessToken() (token *JAuthorizerAccessToken, 
 //CodeToAccessToken 通过code换取access_token
 func (a *Authorizer) CodeToAccessToken(code string) (token *JUserAccessToken, err error) {
 	param := make(map[string]string)
-	param["appid"] = a.AuthorizerAppid
+	param["appid"] = a.Appid
 	param["code"] = code
 	param["grant_type"] = "authorization_code"
 	param["component_appid"] = a.Component.ComponentAppid
@@ -184,7 +184,6 @@ func (a *Authorizer) CodeToAccessToken(code string) (token *JUserAccessToken, er
 	if err != nil {
 		return nil, err
 	}
-	log.Println(string(res))
 	token = new(JUserAccessToken)
 	err = json.Unmarshal(res, token)
 	if err != nil {
@@ -195,5 +194,5 @@ func (a *Authorizer) CodeToAccessToken(code string) (token *JUserAccessToken, er
 
 //GetWecaht 获取微信方法
 func (a *Authorizer) GetWecaht() (w *wechat.Wechat) {
-	return a.Weixin
+	return a.Wechat
 }

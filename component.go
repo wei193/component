@@ -8,6 +8,8 @@ import (
 	"log"
 	"strings"
 	"time"
+
+	"github.com/wei193/component/wechat"
 )
 
 //Component 第三平台信息
@@ -195,10 +197,12 @@ func (c *Component) QueryAuth(code string) (authorizer *Authorizer, err error) {
 	}
 
 	authorizer = &Authorizer{
-		Component:              c,
-		AuthorizerAppid:        auth.AuthorizationInfo.AuthorizerAppid,
-		AuthorizerAccessToken:  auth.AuthorizationInfo.AuthorizerAccessToken,
-		AccessTokenExpires:     time.Now().Unix() + int64(auth.AuthorizationInfo.ExpiresIn),
+		Component: c,
+		Wechat: &wechat.Wechat{
+			Appid:              auth.AuthorizationInfo.AuthorizerAppid,
+			AccessToken:        auth.AuthorizationInfo.AuthorizerAccessToken,
+			AccessTokenExpires: time.Now().Unix() + int64(auth.AuthorizationInfo.ExpiresIn),
+		},
 		AuthorizerRefreshToken: auth.AuthorizationInfo.AuthorizerRefreshToken,
 	}
 	return authorizer, nil
