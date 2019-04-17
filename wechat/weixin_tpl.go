@@ -1,3 +1,7 @@
+// Copyright 2019 wei_193 Author. All Rights Reserved.
+//
+// 微信模板消息管理
+
 package wechat
 
 import (

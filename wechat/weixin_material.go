@@ -16,15 +16,15 @@ import (
 
 //base url
 const (
-	URLMEDIAUPLOAD           = "https://api.weixin.qq.com/cgi-bin/media/upload"
-	URLMEDIAGET              = "https://api.weixin.qq.com/cgi-bin/media/get"
-	URLMEDIAADDNEWS          = "https://api.weixin.qq.com/cgi-bin/material/add_news"
-	URLMEDIAUPDATENEWS       = "https://api.weixin.qq.com/cgi-bin/material/update_news"
-	URLMEDIAUPLOADIMG        = "https://api.weixin.qq.com/cgi-bin/media/uploadimg"
-	URLMEDIAADDMATERIAL      = "https://api.weixin.qq.com/cgi-bin/material/add_material"
-	URLMEDIADELMATERIAL      = "https://api.weixin.qq.com/cgi-bin/material/del_material"
-	URLMEDIAGETMATERIAL      = "https://api.weixin.qq.com/cgi-bin/material/get_material"
-	URLMEDIABATCHGETMATERIAL = "https://api.weixin.qq.com/cgi-bin/material/batchget_material"
+	URLMediaUpload           = "https://api.weixin.qq.com/cgi-bin/media/upload"
+	URLMediaGet              = "https://api.weixin.qq.com/cgi-bin/media/get"
+	URLMediaAddNews          = "https://api.weixin.qq.com/cgi-bin/material/add_news"
+	URLMediaUpdateNews       = "https://api.weixin.qq.com/cgi-bin/material/update_news"
+	URLMediaUploadImg        = "https://api.weixin.qq.com/cgi-bin/media/uploadimg"
+	URLMediaAddMaterial      = "https://api.weixin.qq.com/cgi-bin/material/add_material"
+	URLMediaDelMaterial      = "https://api.weixin.qq.com/cgi-bin/material/del_material"
+	URLMediaGetMaterial      = "https://api.weixin.qq.com/cgi-bin/material/get_material"
+	URLMediaBatchgetMaterial = "https://api.weixin.qq.com/cgi-bin/material/batchget_material"
 )
 
 //TNews 图文消息
@@ -100,7 +100,7 @@ func (wx *Wechat) AddTempMaterial(mediaType, filepath string) (data ReqMedia, er
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["type"] = mediaType
-	req, err := newfileUploadRequest(Param("https://api.weixin.qq.com/cgi-bin/media/upload", param), nil,
+	req, err := newfileUploadRequest(Param(URLMediaUpload, param), nil,
 		"media", filepath)
 	if err != nil {
 		return
@@ -124,7 +124,7 @@ func (wx *Wechat) GetTempMaterial(basepath, mediaid string) (string, error) {
 	param["access_token"] = wx.AccessToken
 	param["media_id"] = mediaid
 
-	req, err := http.NewRequest("GET", Param("https://api.weixin.qq.com/cgi-bin/media/get", param), nil)
+	req, err := http.NewRequest("GET", Param(URLMediaGet, param), nil)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -166,7 +166,7 @@ func (wx *Wechat) AddNews(news []TNews) (data ReqMedia, err error) {
 	}
 	t := articles{news}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/material/add_news", param),
+	req, err := http.NewRequest("POST", Param(URLMediaAddNews, param),
 		bytes.NewReader(d))
 	resBody, err := requsetJSON(req, 0)
 	if err != nil {
@@ -194,7 +194,7 @@ func (wx *Wechat) UpdateNews(Mediaid string, Index int, news TNews) int {
 	}
 	t := articles{Mediaid, Index, news}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/material/update_news", param),
+	req, err := http.NewRequest("POST", Param(URLMediaUpdateNews, param),
 		bytes.NewReader(d))
 	_, err = requsetJSON(req, 0)
 	if err != nil {
@@ -208,7 +208,7 @@ func (wx *Wechat) UploadImg(filepath string) (data ReqMedia, err error) {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 
-	req, err := newfileUploadRequest(Param("https://api.weixin.qq.com/cgi-bin/media/uploadimg", param),
+	req, err := newfileUploadRequest(Param(URLMediaUploadImg, param),
 		nil, "media", filepath)
 	if err != nil {
 		return
@@ -232,7 +232,7 @@ func (wx *Wechat) AddMaterial(mediaType, filepath string) (data ReqMedia, err er
 	param["access_token"] = wx.AccessToken
 	param["type"] = mediaType
 
-	req, err := newfileUploadRequest(Param("https://api.weixin.qq.com/cgi-bin/material/add_material", param),
+	req, err := newfileUploadRequest(Param(URLMediaAddMaterial, param),
 		nil, "media", filepath)
 	if err != nil {
 		return
@@ -257,7 +257,7 @@ func (wx *Wechat) DelMaterial(mediaid string) int {
 	}
 	t := stTmp{mediaid}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/material/del_material?access_token="+
+	req, err := http.NewRequest("POST", URLMediaDelMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
 
 	_, err = requsetJSON(req, 0)
@@ -269,14 +269,12 @@ func (wx *Wechat) DelMaterial(mediaid string) int {
 
 //GetMaterial 获取除文章和视频类型外的媒体资源
 func (wx *Wechat) GetMaterial(basepath, mediaid string) (string, error) {
-	//	https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=ACCESS_TOKEN
-	//	http.Get()
 	type stTmp struct {
 		Mediaid string `json:"media_id"`
 	}
 	t := stTmp{mediaid}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/material/get_material?access_token="+
+	req, err := http.NewRequest("POST", URLMediaGetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -318,7 +316,7 @@ func (wx *Wechat) GetMaterialsNews(Type string, offset, count int) (data ResNews
 	}
 	t := stTmp{Type, offset, count}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token="+
+	req, err := http.NewRequest("POST", URLMediaBatchgetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
 	resBody, err := requsetJSON(req, 0)
 	if err != nil {
@@ -342,7 +340,7 @@ func (wx *Wechat) GetMaterials(Type string, offset, count int) (data TMaterialLi
 	}
 	t := stTmp{Type, offset, count}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token="+
+	req, err := http.NewRequest("POST", URLMediaBatchgetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
 	resBody, err := requsetJSON(req, 0)
 	if err != nil {
