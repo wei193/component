@@ -163,40 +163,44 @@ func (wx *Wechat) GetAccessToken() (err error) {
 }
 
 //CheckAccessToken 检查微信access_token有效性
-func (wx *Wechat) CheckAccessToken() int {
+func (wx *Wechat) CheckAccessToken() (err error) {
 	req, err := http.NewRequest("GET", URLGETCALLBACKIP+"?access_token="+
 		wx.AccessToken, nil)
 	_, err = requsetJSON(req, 0)
 	if err != nil {
-		return 0
+		return err
 	}
-	return 1
+	return nil
 }
 
 //GetJsapiTicket 获取js的jsapi_ticket
-func (wx *Wechat) GetJsapiTicket() int {
+func (wx *Wechat) GetJsapiTicket() (err error) {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["type"] = "jsapi"
 	req, err := http.NewRequest("GET", Param(URLGETTICKET, param), nil)
+	if err != nil {
+		return err
+	}
 
 	resBody, err := requsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
-		return 0
+		return err
 	}
 	var tmpTick resJsTicket
 	err = json.Unmarshal(resBody, &tmpTick)
 	if err != nil {
 		log.Println(err)
-		return 0
+		return err
 	} else if tmpTick.Errcode == 0 {
 		wx.JsapiTokenTime = time.Now().Unix()
 		wx.JsapiTicket = tmpTick.Ticket
 		wx.JsapiTokenExpires = time.Now().Unix() + int64(tmpTick.Expiresin)
-		return 1
+		return nil
+	} else {
+		return errors.New(tmpTick.Errmsg)
 	}
-	return 0
 }
 
 //CreateJsSignature 创建jsapi_ticket签名
