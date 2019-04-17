@@ -15,6 +15,7 @@ type Authorizer struct {
 	AuthorizerAccessToken  string
 	AccessTokenExpires     int64
 	AuthorizerRefreshToken string
+	Weixin                 *wechat.Wechat
 }
 
 //JAuthorizer 授权信息
@@ -94,6 +95,11 @@ func (c *Component) NewAuthorizer(appid, accesstoken string, tokenexpires int64,
 		AuthorizerAccessToken:  accesstoken,
 		AccessTokenExpires:     tokenexpires,
 		AuthorizerRefreshToken: refreshtoken,
+		Weixin: &wechat.Wechat{
+			Appid:              appid,
+			AccessToken:        accesstoken,
+			AccessTokenExpires: tokenexpires,
+		},
 	}
 	return
 }
@@ -189,14 +195,5 @@ func (a *Authorizer) CodeToAccessToken(code string) (token *JUserAccessToken, er
 
 //GetWecaht 获取微信方法
 func (a *Authorizer) GetWecaht() (w *wechat.Wechat) {
-	return &wechat.Wechat{
-		Appid: a.AuthorizerAppid,
-		// Appsecret       :,
-		// Token           :,
-		// Encodingaeskey  :,
-		AccessToken:        a.AuthorizerAccessToken,
-		AccessTokenExpires: a.AccessTokenExpires,
-		// JsapiTicket     :,
-		// JsapiTokenTime  :,
-	}
+	return a.Weixin
 }
