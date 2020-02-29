@@ -7,6 +7,7 @@ package wechat
 import (
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -16,8 +17,11 @@ const (
 	URLCardPaycell         = "https://api.weixin.qq.com/card/paycell/set"         //设置买单接口
 	URLCardSelfconsumecell = "https://api.weixin.qq.com/card/selfconsumecell/set" //设置自助核销
 	URLCardQrcode          = "https://api.weixin.qq.com/card/qrcode/create"       //创建二维码
-	URLCardBatchget        = "https://api.weixin.qq.com/card/batchget"            //批量获取卡券
 
+	URLCardCodeGet         = "https://api.weixin.qq.com/card/code/get"         //查询Code接口
+	URLCardUserGetcardlist = "https://api.weixin.qq.com/card/user/getcardlist" //获取用户已领取卡券接口
+	URLCardGet             = "https://api.weixin.qq.com/card/get"              //查看卡券详情
+	URLCardBatchget        = "https://api.weixin.qq.com/card/batchget"         //批量获取卡券
 )
 
 //TACard 卡券创建
@@ -154,6 +158,28 @@ type TTimeLimit struct {
 	EndMinute   int    `json:"end_minute,omitempty"`
 }
 
+//TScanCard 创建二维码接口参数
+type TScanCard struct {
+	Code          string `json:"code"`
+	CardID        string `json:"card_id,omitempty"`
+	ExpireSeconds int    `json:"expire_seconds,omitempty"`
+	Openid        string `json:"openid,omitempty"`
+	IsUniqueCode  bool   `json:"is_unique_code,omitempty"`
+	OuterID       int    `json:"outer_id,omitempty"`
+	OuterStr      string `json:"outer_str,omitempty"`
+}
+
+//TActionInfo 创建二维码接口参数请求体
+type TActionInfo struct {
+	Card         *TScanCard     `json:"card,omitempty"`
+	MultipleCard *TMultipleCard `json:"multiple_card,omitempty"`
+}
+
+//TMultipleCard TMultipleCard
+type TMultipleCard struct {
+	CardList []TScanCard `json:"card_list,omitempty"`
+}
+
 //CardCreate 创建卡券
 func (wx *Wechat) CardCreate(card TACard) (cardid string, err error) {
 	param := make(map[string]string)
@@ -225,7 +251,158 @@ func (wx *Wechat) CardSelfconsumecell(cardid string, isopen bool) (err error) {
 	return nil
 }
 
-//CardQrcode 创建二维码接口
-func (wx *Wechat) CardQrcode() {
+//CardSingleQrcode 创建二维码接口
+func (wx *Wechat) CardSingleQrcode(card TScanCard) (err error) {
+	param := make(map[string]string)
+	param["access_token"] = wx.AccessToken
 
+	type st struct {
+		ActionName    string      `json:"action_name"`
+		ExpireSeconds int         `json:"expire_seconds,omitempty"`
+		ActionInfo    TActionInfo `json:"action_info"`
+	}
+	data := st{
+		ActionName:    "QR_CARD",
+		ExpireSeconds: card.ExpireSeconds,
+		ActionInfo: TActionInfo{
+			Card: &card,
+		},
+	}
+	d, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", Param(URLCardQrcode, param),
+		bytes.NewReader(d))
+
+	_, err = requsetJSON(req, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//CardMultipleQrcode 创建二维码接口
+func (wx *Wechat) CardMultipleQrcode(cards []TScanCard) (err error) {
+	param := make(map[string]string)
+	param["access_token"] = wx.AccessToken
+
+	type st struct {
+		ActionName    string      `json:"action_name"`
+		ExpireSeconds int         `json:"expire_seconds,omitempty"`
+		ActionInfo    TActionInfo `json:"action_info"`
+	}
+	data := st{
+		ActionName: "QR_MULTIPLE_CARD",
+		ActionInfo: TActionInfo{
+			MultipleCard: &TMultipleCard{
+				CardList: cards,
+			},
+		},
+	}
+	d, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", Param(URLCardQrcode, param),
+		bytes.NewReader(d))
+
+	_, err = requsetJSON(req, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//CardCodeGet 查询Code接口
+func (wx *Wechat) CardCodeGet(code string, cardid string, checkConsume bool) (err error) {
+	param := make(map[string]string)
+	param["access_token"] = wx.AccessToken
+
+	type st struct {
+		Code         string `json:"code"`
+		CardID       string `json:"card_id,omitempty"`
+		CheckConsume bool   `json:"check_consume"`
+	}
+	data := st{
+		Code:         code,
+		CardID:       cardid,
+		CheckConsume: checkConsume,
+	}
+	d, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", Param(URLCardCodeGet, param),
+		bytes.NewReader(d))
+
+	_, err = requsetJSON(req, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//CardUserGetcardlist 获取用户已领取卡券接口
+func (wx *Wechat) CardUserGetcardlist(openid string, cardid string) (err error) {
+	param := make(map[string]string)
+	param["access_token"] = wx.AccessToken
+
+	type st struct {
+		Openid string `json:"openid"`
+		CardID string `json:"card_id,omitempty"`
+	}
+	data := st{
+		Openid: openid,
+		CardID: cardid,
+	}
+	d, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", Param(URLCardUserGetcardlist, param),
+		bytes.NewReader(d))
+
+	_, err = requsetJSON(req, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//CardGet 查看卡券详情
+func (wx *Wechat) CardGet(cardid string) (err error) {
+	param := make(map[string]string)
+	param["access_token"] = wx.AccessToken
+
+	type st struct {
+		CardID string `json:"card_id"`
+	}
+	data := st{
+		CardID: cardid,
+	}
+	d, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", Param(URLCardGet, param),
+		bytes.NewReader(d))
+
+	_, err = requsetJSON(req, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//CardBatchget 批量查询卡券列表
+func (wx *Wechat) CardBatchget(statusList []string, offset, count int) (err error) {
+	param := make(map[string]string)
+	param["access_token"] = wx.AccessToken
+
+	type st struct {
+		Offset     int      `json:"offset"`
+		Count      int      `json:"count"`
+		StatusList []string `json:"status_list,omitempty"`
+	}
+	data := st{
+		Offset:     offset,
+		Count:      count,
+		StatusList: statusList,
+	}
+	d, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", Param(URLCardBatchget, param),
+		bytes.NewReader(d))
+
+	body, err := requsetJSON(req, 0)
+	if err != nil {
+		return err
+	}
+	log.Println(string(body))
+	return nil
 }

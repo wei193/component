@@ -260,6 +260,54 @@ func requset(req *http.Request) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
+func (wx *Wechat) httpsRequsetXML(req *http.Request, tflag int, isXML ...bool) ([]byte, error) {
+	resBody, err := wx.httpsRequset(req)
+	if err != nil {
+		return nil, err
+	}
+	if len(isXML) == 1 && !isXML[0] {
+		return resBody, nil
+	}
+	var errcode XMLError
+	err = xml.Unmarshal(resBody, &errcode)
+	if err != nil ||
+		errcode.ReturnCode != "SUCCESS" ||
+		errcode.ResultCode != "SUCCESS" ||
+		errcode.ErrCode != "" {
+		return resBody, errors.New(string(resBody))
+	}
+
+	return resBody, nil
+}
+
+func (wx *Wechat) httpsRequset(req *http.Request) ([]byte, error) {
+	tlsConfig := wx.Mch._tlsConfig
+	if tlsConfig == nil {
+		return nil, errors.New("init tls Config Error")
+	}
+	tr := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: tr}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
+}
+
+//httpsPost  HttpsPost请求
+func (wx *Wechat) httpsPost(url string, xmlContent []byte, ContentType string) (*http.Response, error) {
+	tlsConfig := wx.Mch._tlsConfig
+	if tlsConfig == nil {
+		return nil, errors.New("init tls Config Error")
+	}
+	tr := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: tr}
+	return client.Post(url,
+		ContentType,
+		bytes.NewBuffer(xmlContent))
+}
+
 //Param 生成请求url参数
 func Param(urlBase string, P map[string]string) string {
 	for k, v := range P {
@@ -462,17 +510,4 @@ func getTLSConfig(certpath, keypath, capath string) (*tls.Config, error) {
 		Certificates: []tls.Certificate{cert},
 		RootCAs:      pool,
 	}, nil
-}
-
-//httpsPost  HttpsPost请求
-func (wx *Wechat) httpsPost(url string, xmlContent []byte, ContentType string) (*http.Response, error) {
-	tlsConfig := wx.Mch._tlsConfig
-	if tlsConfig == nil {
-		return nil, errors.New("init tls Config Error")
-	}
-	tr := &http.Transport{TLSClientConfig: tlsConfig}
-	client := &http.Client{Transport: tr}
-	return client.Post(url,
-		ContentType,
-		bytes.NewBuffer(xmlContent))
 }

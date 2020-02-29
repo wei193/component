@@ -7,16 +7,29 @@ import (
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/wei193/wechat"
 )
 
 //baseurl
 const (
+	//下单
 	URLPAYUNIFIEDORDER = "https://api.mch.weixin.qq.com/pay/unifiedorder"
-	URLPAYORDERQUERY   = "https://api.mch.weixin.qq.com/pay/orderquery"
-	URLPAYCLOSEORDER   = "https://api.mch.weixin.qq.com/pay/closeorder"
-	URLDOWNLOADBILL    = "https://api.mch.weixin.qq.com/pay/downloadbill"
+
+	//查询订单
+	URLPAYORDERQUERY = "https://api.mch.weixin.qq.com/pay/orderquery"
+
+	//关闭订单
+	URLPAYCLOSEORDER = "https://api.mch.weixin.qq.com/pay/closeorder"
+
+	//下载交易账单
+	URLDOWNLOADBILL = "https://api.mch.weixin.qq.com/pay/downloadbill"
+
+	//申请退款
+	URLPAYREFUND = "https://api.mch.weixin.qq.com/secapi/pay/refund"
+
+	//查询退款
+	URLPAYREFUNDQUERY = "https://api.mch.weixin.qq.com/pay/refundquery"
+
+	// https://api.mch.weixin.qq.com/billcommentsp/batchquerycomment
 )
 
 //ReqHongbao 红包发送结构体
@@ -153,6 +166,104 @@ type ResCloseOrder struct {
 	ErrCodeDes string `xml:"err_code_des"`
 }
 
+//ReqRefund 退款申请请求
+type ReqRefund struct {
+	XMLName       xml.Name `xml:"xml"`
+	Appid         string   `xml:"appid"`
+	Mchid         string   `xml:"mch_id"`
+	DeviceInfo    string   `xml:"device_info,omitempty"`
+	NonceStr      string   `xml:"nonce_str"`
+	Sign          string   `xml:"sign"`
+	SignType      string   `xml:"sign_type,omitempty"`
+	Transactionid string   `xml:"transaction_id,omitempty"`
+	OutTradeNo    string   `xml:"out_trade_no,omitempty"`
+	OutRefundNo   string   `xml:"out_refund_no"`
+	RefundFee     int      `xml:"refund_fee"`
+	RefundFeeType string   `xml:"refund_fee_type,omitempty"`
+	RefundDesc    string   `xml:"refund_desc,omitempty"`
+	RefundAccount string   `xml:"refund_account,omitempty"`
+	NotifyURL     string   `xml:"notify_url,omitempty"`
+	//
+}
+
+//ResRefund 退款申请返回
+type ResRefund struct {
+	ReturnCode          string `xml:"return_code"`
+	ReturnMsg           string `xml:"return_msg"`
+	Appid               string `xml:"appid"`
+	Mchid               string `xml:"mch_id"`
+	NonceStr            string `xml:"nonce_str"`
+	Sign                string `xml:"sign"`
+	Transactionid       string `xml:"transaction_id"`
+	OutTradeNo          string `xml:"out_trade_no"`
+	OutRefundNo         string `xml:"out_refund_no"`
+	RefundID            string `xml:"refund_id"`
+	RefundFee           int    `xml:"refund_fee"`
+	SettlementRefundFee int    `xml:"settlement_refund_fee,omitempty"`
+	TotalFee            int    `xml:"total_fee"`
+	SettlementTotalFee  int    `xml:"settlement_total_fee,omitempty"`
+	FeeType             string `xml:"fee_type,omitempty"`
+	CashFee             int    `xml:"cash_fee"`
+	CashFeeType         string `xml:"cash_fee_type,omitempty"`
+	CashRefundFee       int    `xml:"cash_refund_fee,omitempty"`
+	CouponRefundFee     int    `xml:"coupon_refund_fee,omitempty"`
+	CouponRefundCount   int    `xml:"coupon_refund_count,omitempty"`
+	ResultCode          string `xml:"result_code"`
+	ErrCode             string `xml:"err_code"`
+	ErrCodeDes          string `xml:"err_code_des"`
+}
+
+//ReqRefundquery 退款查询
+type ReqRefundquery struct {
+	XMLName       xml.Name `xml:"xml"`
+	Appid         string   `xml:"appid"`
+	Mchid         string   `xml:"mch_id"`
+	DeviceInfo    string   `xml:"device_info,omitempty"`
+	NonceStr      string   `xml:"nonce_str"`
+	Sign          string   `xml:"sign"`
+	SignType      string   `xml:"sign_type,omitempty"`
+	Transactionid string   `xml:"transaction_id,"`
+	OutTradeNo    string   `xml:"out_trade_no,omitempty"`
+	OutRefundNo   string   `xml:"out_refund_no,omitempty"`
+	RefundID      string   `xml:"refund_id,omitempty"`
+	Offset        int      `xml:"offset,omitempty"`
+}
+
+//ResReqRefundquery 退款查询返回
+type ResReqRefundquery struct {
+	ReturnCode         string `xml:"return_code"`
+	ReturnMsg          string `xml:"return_msg"`
+	Appid              string `xml:"appid"`
+	Mchid              string `xml:"mch_id"`
+	NonceStr           string `xml:"nonce_str"`
+	Sign               string `xml:"sign"`
+	TotalRefundCount   int    `xml:"total_refund_count,omitempty"`
+	Transactionid      string `xml:"transaction_id"`
+	OutTradeNo         string `xml:"out_trade_no"`
+	TotalFee           int    `xml:"total_fee"`
+	SettlementTotalFee int    `xml:"settlement_total_fee,omitempty"`
+	FeeType            string `xml:"fee_type,omitempty"`
+	CashFee            int    `xml:"cash_fee"`
+	RefundCount        int    `xml:"refund_count"`
+
+	OutRefundNo0         string `xml:"out_refund_no_0,omitempty"`
+	RefundID0            string `xml:"refund_id_0,omitempty"`
+	RefundFee0           int    `xml:"refund_fee_0,omitempty"`
+	SettlementRefundFee0 int    `xml:"settlement_refund_fee0,omitempty"`
+	RefundChannel0       string `xml:"refund_channel_0,omitempty"`
+	RefundStatus0        string `xml:"refund_status_0,omitempty"`
+	RefundAccount0       string `xml:"refund_account_0,omitempty"`
+	RefundRecvAccout0    string `xml:"refund_recv_accout_0,omitempty"`
+	RefundSuccessTime0   string `xml:"refund_success_time_0,omitempty"`
+
+	CashRefundFee     int    `xml:"cash_refund_fee,omitempty"`
+	CouponRefundFee   int    `xml:"coupon_refund_fee,omitempty"`
+	CouponRefundCount int    `xml:"coupon_refund_count,omitempty"`
+	ResultCode        string `xml:"result_code"`
+	ErrCode           string `xml:"err_code"`
+	ErrCodeDes        string `xml:"err_code_des"`
+}
+
 //ReqDownloadBill 请求下载对账单
 type ReqDownloadBill struct {
 	XMLName  xml.Name `xml:"xml"`
@@ -268,8 +379,61 @@ func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) 
 }
 
 //Refund 申请退款https://api.mch.weixin.qq.com/secapi/pay/refund
-func (wx *Wechat) Refund() {
+func (wx *Wechat) Refund(refund ReqRefund) (data ResRefund, err error) {
+	refund.Appid = wx.Appid
+	refund.Mchid = wx.Mch.MchID
+	refund.Sign = XMLSignMd5(refund, wx.Mch.PayKey)
+	d, err := xml.MarshalIndent(&refund, "", " ")
+	if err != nil {
+		return data, err
+	}
+	// res, err := wx.httpsPost(URLPAYREFUND, d, "text/xml")
+	// if err != nil {
+	// 	return data, err
+	// }
+	// defer res.Body.Close()
+	// resBody, err := ioutil.ReadAll(res.Body)
+	req, err := http.NewRequest("POST", URLPAYREFUND, bytes.NewReader(d))
+	resBody, err := wx.httpsRequsetXML(req, -1)
+	if err != nil {
+		return data, err
+	}
+	err = xml.Unmarshal(resBody, &data)
+	if err != nil {
+		return data, err
+	}
+	Sign := data.Sign
+	data.Sign = ""
+	if XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		return data, errors.New("签名错误")
+	}
+	return data, nil
+}
 
+//RefundQuery 申请退款查询https://api.mch.weixin.qq.com/pay/refundquery
+func (wx *Wechat) RefundQuery(refund ReqRefundquery) (data ResReqRefundquery, err error) {
+	refund.Appid = wx.Appid
+	refund.Mchid = wx.Mch.MchID
+	refund.Sign = XMLSignMd5(refund, wx.Mch.PayKey)
+	d, err := xml.MarshalIndent(&refund, "", " ")
+	if err != nil {
+		return data, err
+	}
+	req, err := http.NewRequest("POST", URLPAYREFUNDQUERY, bytes.NewReader(d))
+	resBody, err := requsetXML(req, -1)
+	if err != nil {
+		return data, err
+	}
+	err = xml.Unmarshal(resBody, &data)
+	if err != nil {
+		return data, err
+	}
+	Sign := data.Sign
+	data.Sign = ""
+	if XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		return data, errors.New("签名错误")
+	}
+	return data, nil
 }
 
 //Downloadbill 下载对账单https://api.mch.weixin.qq.com/pay/downloadbill
@@ -318,7 +482,7 @@ func (wx *Wechat) CreatePaySign(prepayid string) (data TPaySign) {
 	data = TPaySign{
 		AppID:     wx.Appid,
 		Timestamp: time.Now().Unix(),
-		NonceStr:  wechat.RandomStr(20, 3),
+		NonceStr:  RandomStr(20, 3),
 		Package:   "prepay_id=" + prepayid,
 		SignType:  "MD5",
 	}
@@ -333,7 +497,7 @@ func (wx *Wechat) CreateAPPPaySign(prepayid string) (data TAPPPaySign) {
 		Partnerid: wx.Mch.MchID,
 		Prepayid:  prepayid,
 		Package:   "Sign=WXPay",
-		NonceStr:  wechat.RandomStr(20, 3),
+		NonceStr:  RandomStr(20, 3),
 		Timestamp: time.Now().Unix(),
 	}
 	data.PaySign = XMLSignMd5(data, wx.Mch.PayKey)
