@@ -177,6 +177,7 @@ type ReqRefund struct {
 	Transactionid string   `xml:"transaction_id,omitempty"`
 	OutTradeNo    string   `xml:"out_trade_no,omitempty"`
 	OutRefundNo   string   `xml:"out_refund_no"`
+	TotalFee      int      `xml:"total_fee"`
 	RefundFee     int      `xml:"refund_fee"`
 	RefundFeeType string   `xml:"refund_fee_type,omitempty"`
 	RefundDesc    string   `xml:"refund_desc,omitempty"`
