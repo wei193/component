@@ -116,7 +116,7 @@ func New(Appid, Appsecret, Token, Encodingaeskey string) *Wechat {
 }
 
 //SetMch 设置商户
-func (wx *Wechat) SetMch(mchid, paykey, certpath, keypath, capath string) {
+func (wx *Wechat) SetMch(mchid, paykey, certpath, keypath, capath string) (err error) {
 	if wx.Mch == nil {
 		wx.Mch = &MchInfo{
 			MchID:  mchid,
@@ -126,7 +126,8 @@ func (wx *Wechat) SetMch(mchid, paykey, certpath, keypath, capath string) {
 		wx.Mch.MchID = mchid
 		wx.Mch.PayKey = paykey
 	}
-	wx.Mch._tlsConfig, _ = getTLSConfig(certpath, keypath, capath)
+	wx.Mch._tlsConfig, err = getTLSConfig(certpath, keypath, capath)
+	return err
 }
 
 //GetAccessToken 获取 access_token

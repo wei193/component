@@ -171,7 +171,6 @@ type ReqRefund struct {
 	XMLName       xml.Name `xml:"xml"`
 	Appid         string   `xml:"appid"`
 	Mchid         string   `xml:"mch_id"`
-	DeviceInfo    string   `xml:"device_info,omitempty"`
 	NonceStr      string   `xml:"nonce_str"`
 	Sign          string   `xml:"sign"`
 	SignType      string   `xml:"sign_type,omitempty"`
@@ -218,7 +217,6 @@ type ReqRefundquery struct {
 	XMLName       xml.Name `xml:"xml"`
 	Appid         string   `xml:"appid"`
 	Mchid         string   `xml:"mch_id"`
-	DeviceInfo    string   `xml:"device_info,omitempty"`
 	NonceStr      string   `xml:"nonce_str"`
 	Sign          string   `xml:"sign"`
 	SignType      string   `xml:"sign_type,omitempty"`
