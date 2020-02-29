@@ -499,15 +499,20 @@ func getTLSConfig(certpath, keypath, capath string) (*tls.Config, error) {
 		return nil, err
 	}
 
-	caData, err := ioutil.ReadFile(capath)
-	if err != nil {
-		return nil, err
+	if capath != "" {
+		caData, err := ioutil.ReadFile(capath)
+		if err != nil {
+			return nil, err
+		}
+		pool := x509.NewCertPool()
+		pool.AppendCertsFromPEM(caData)
+		return &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			RootCAs:      pool,
+		}, nil
 	}
-	pool := x509.NewCertPool()
-	pool.AppendCertsFromPEM(caData)
 
 	return &tls.Config{
 		Certificates: []tls.Certificate{cert},
-		RootCAs:      pool,
 	}, nil
 }
