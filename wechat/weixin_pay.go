@@ -54,7 +54,7 @@ type ReqHongbao struct {
 type ResHongbao struct {
 	XMLName    xml.Name `xml:"xml"`
 	ReturnCode string   `xml:"return_code"`
-	ReturnMsg  string   `xml:"return_msg"`
+	ReturnMsg  string   `xml:"return_msg,omitempty"`
 	ResultCode string   `xml:"result_code"`
 	ErrCode    string   `xml:"err_code"`
 	ErrCodeSes string   `xml:"err_code_des"`
@@ -156,14 +156,14 @@ type ResUnifiedOrder struct {
 //ResCloseOrder 关闭订单
 type ResCloseOrder struct {
 	ReturnCode string `xml:"return_code"`
-	ReturnMsg  string `xml:"return_msg"`
+	ReturnMsg  string `xml:"return_msg,omitempty"`
 	Appid      string `xml:"appid"`
 	Mchid      string `xml:"mch_id"`
 	NonceStr   string `xml:"nonce_str"`
-	Sign       string `xml:"sign"`
+	Sign       string `xml:"sign,omitempty"`
 	ResultCode string `xml:"result_code"`
-	ErrCode    string `xml:"err_code"`
-	ErrCodeDes string `xml:"err_code_des"`
+	ErrCode    string `xml:"err_code,omitempty"`
+	ErrCodeDes string `xml:"err_code_des,omitempty"`
 }
 
 //ReqRefund 退款申请请求
@@ -189,7 +189,7 @@ type ReqRefund struct {
 //ResRefund 退款申请返回
 type ResRefund struct {
 	ReturnCode          string `xml:"return_code"`
-	ReturnMsg           string `xml:"return_msg"`
+	ReturnMsg           string `xml:"return_msg,omitempty"`
 	Appid               string `xml:"appid"`
 	Mchid               string `xml:"mch_id"`
 	NonceStr            string `xml:"nonce_str"`
@@ -198,6 +198,7 @@ type ResRefund struct {
 	OutTradeNo          string `xml:"out_trade_no"`
 	OutRefundNo         string `xml:"out_refund_no"`
 	RefundID            string `xml:"refund_id"`
+	RefundChannel       string `xml:"refund_channel"`
 	RefundFee           int    `xml:"refund_fee"`
 	SettlementRefundFee int    `xml:"settlement_refund_fee,omitempty"`
 	TotalFee            int    `xml:"total_fee"`
@@ -206,11 +207,11 @@ type ResRefund struct {
 	CashFee             int    `xml:"cash_fee"`
 	CashFeeType         string `xml:"cash_fee_type,omitempty"`
 	CashRefundFee       int    `xml:"cash_refund_fee,omitempty"`
-	CouponRefundFee     int    `xml:"coupon_refund_fee,omitempty"`
-	CouponRefundCount   int    `xml:"coupon_refund_count,omitempty"`
+	CouponRefundFee     int    `xml:"coupon_refund_fee"`
+	CouponRefundCount   int    `xml:"coupon_refund_count"`
 	ResultCode          string `xml:"result_code"`
-	ErrCode             string `xml:"err_code"`
-	ErrCodeDes          string `xml:"err_code_des"`
+	ErrCode             string `xml:"err_code,omitempty"`
+	ErrCodeDes          string `xml:"err_code_des,omitempty"`
 }
 
 //ReqRefundquery 退款查询
@@ -221,7 +222,7 @@ type ReqRefundquery struct {
 	NonceStr      string   `xml:"nonce_str"`
 	Sign          string   `xml:"sign"`
 	SignType      string   `xml:"sign_type,omitempty"`
-	Transactionid string   `xml:"transaction_id,"`
+	Transactionid string   `xml:"transaction_id,omitempty,"`
 	OutTradeNo    string   `xml:"out_trade_no,omitempty"`
 	OutRefundNo   string   `xml:"out_refund_no,omitempty"`
 	RefundID      string   `xml:"refund_id,omitempty"`
@@ -231,11 +232,11 @@ type ReqRefundquery struct {
 //ResReqRefundquery 退款查询返回
 type ResReqRefundquery struct {
 	ReturnCode         string `xml:"return_code"`
-	ReturnMsg          string `xml:"return_msg"`
+	ReturnMsg          string `xml:"return_msg,omitempty"`
 	Appid              string `xml:"appid"`
 	Mchid              string `xml:"mch_id"`
 	NonceStr           string `xml:"nonce_str"`
-	Sign               string `xml:"sign"`
+	Sign               string `xml:"sign,omitempty"`
 	TotalRefundCount   int    `xml:"total_refund_count,omitempty"`
 	Transactionid      string `xml:"transaction_id"`
 	OutTradeNo         string `xml:"out_trade_no"`
@@ -244,6 +245,16 @@ type ResReqRefundquery struct {
 	FeeType            string `xml:"fee_type,omitempty"`
 	CashFee            int    `xml:"cash_fee"`
 	RefundCount        int    `xml:"refund_count"`
+
+	OutRefundNo         string `xml:"out_refund_no,omitempty"`
+	RefundID            string `xml:"refund_id,omitempty"`
+	RefundFee           int    `xml:"refund_fee,omitempty"`
+	SettlementRefundFee int    `xml:"settlement_refund_fe,omitempty"`
+	RefundChannel       string `xml:"refund_channel,omitempty"`
+	RefundStatus        string `xml:"refund_status,omitempty"`
+	RefundAccount       string `xml:"refund_account,omitempty"`
+	RefundRecvAccout    string `xml:"refund_recv_accout,omitempty"`
+	RefundSuccessTime   string `xml:"refund_success_time,omitempty"`
 
 	OutRefundNo0         string `xml:"out_refund_no_0,omitempty"`
 	RefundID0            string `xml:"refund_id_0,omitempty"`
@@ -255,12 +266,22 @@ type ResReqRefundquery struct {
 	RefundRecvAccout0    string `xml:"refund_recv_accout_0,omitempty"`
 	RefundSuccessTime0   string `xml:"refund_success_time_0,omitempty"`
 
+	OutRefundNo1         string `xml:"out_refund_no_1,omitempty"`
+	RefundID1            string `xml:"refund_id_1,omitempty"`
+	RefundFee1           int    `xml:"refund_fee_1,omitempty"`
+	SettlementRefundFee1 int    `xml:"settlement_refund_fee1,omitempty"`
+	RefundChannel1       string `xml:"refund_channel_1,omitempty"`
+	RefundStatus1        string `xml:"refund_status_1,omitempty"`
+	RefundAccount1       string `xml:"refund_account_1,omitempty"`
+	RefundRecvAccout1    string `xml:"refund_recv_accout_1,omitempty"`
+	RefundSuccessTime1   string `xml:"refund_success_time_1,omitempty"`
+
 	CashRefundFee     int    `xml:"cash_refund_fee,omitempty"`
 	CouponRefundFee   int    `xml:"coupon_refund_fee,omitempty"`
 	CouponRefundCount int    `xml:"coupon_refund_count,omitempty"`
 	ResultCode        string `xml:"result_code"`
-	ErrCode           string `xml:"err_code"`
-	ErrCodeDes        string `xml:"err_code_des"`
+	ErrCode           string `xml:"err_code,omitempty"`
+	ErrCodeDes        string `xml:"err_code_des,omitempty"`
 }
 
 //ReqDownloadBill 请求下载对账单
@@ -386,15 +407,12 @@ func (wx *Wechat) Refund(refund ReqRefund) (data ResRefund, err error) {
 	if err != nil {
 		return data, err
 	}
-	// res, err := wx.httpsPost(URLPAYREFUND, d, "text/xml")
-	// if err != nil {
-	// 	return data, err
-	// }
-	// defer res.Body.Close()
-	// resBody, err := ioutil.ReadAll(res.Body)
 	req, err := http.NewRequest("POST", URLPAYREFUND, bytes.NewReader(d))
 	resBody, err := wx.httpsRequsetXML(req, -1)
 	if err != nil {
+		if resBody != nil {
+			xml.Unmarshal(resBody, &data)
+		}
 		return data, err
 	}
 	err = xml.Unmarshal(resBody, &data)
