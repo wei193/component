@@ -2,6 +2,9 @@ package wechat
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/xml"
 	"errors"
 	"log"
@@ -316,6 +319,33 @@ type TAPPPaySign struct {
 	PaySign   string `xml:"sign" json:"sign"`
 }
 
+//ResCallBackRefund  微信退款回调
+type ResCallBackRefund struct {
+	ReturnCode string `xml:"return_code"`
+	ReturnMsg  string `xml:"return_msg"`
+	Appid      string `xml:"appid"`
+	Mchid      string `xml:"mch_id"`
+	NonceStr   string `xml:"nonce_str"`
+	ReqInfo    string `xml:"req_info"`
+}
+
+//CallBackRefund 微信退款回调信息
+type CallBackRefund struct {
+	Transactionid       string `xml:"transaction_id"`
+	OutTradeNo          string `xml:"out_trade_no"`
+	RefundID            string `xml:"refund_id"`
+	OutRefundNo         string `xml:"out_refund_no"`
+	TotalFee            int    `xml:"total_fee"`
+	SettlementTotalFee  int    `xml:"settlement_total_fee,omitempty"`
+	RefundFee           int    `xml:"refund_fee"`
+	SettlementRefundFee int    `xml:"settlement_refund_fe"`
+	RefundStatus        string `xml:"refund_status"`
+	SuccessTime         string `xml:"success_time,omitempty"`
+	RefundRecvAccout    string `xml:"refund_recv_accout"`
+	RefundAccount       string `xml:"refund_account"`
+	RefundRequestSource string `xml:"refund_request_source"`
+}
+
 //UnifiedOrder 支付下单https://api.mch.weixin.qq.com/pay/unifiedorder
 func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err error) {
 	order.Appid = wx.Appid
@@ -519,4 +549,23 @@ func (wx *Wechat) CreateAPPPaySign(prepayid string) (data TAPPPaySign) {
 	}
 	data.PaySign = XMLSignMd5(data, wx.Mch.PayKey)
 	return
+}
+
+//ParseRefundCallBack 解析退款回调信息
+func (wx *Wechat) ParseRefundCallBack(reqInfo string) (res *CallBackRefund, err error) {
+	buf, err := base64.StdEncoding.DecodeString(reqInfo)
+	if err != nil {
+		return nil, err
+	}
+	h := md5.New()
+	h.Write([]byte(wx.Mch.PayKey))
+	key := []byte(hex.EncodeToString(h.Sum(nil)))
+
+	buf, err = AesECBDecrypt(key, buf)
+	res = new(CallBackRefund)
+	err = xml.Unmarshal(buf, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
