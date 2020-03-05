@@ -50,11 +50,12 @@ type JSONError struct {
 
 //XMLError  微信错误
 type XMLError struct {
-	ReturnCode string `xml:"return_code"`
-	ReturnMsg  string `xml:"return_msg"`
-	ResultCode string `xml:"result_code"`
-	ErrCode    string `xml:"err_code"`
-	ErrCodeDes string `xml:"err_code_des"`
+	XMLName    xml.Name `xml:"xml"`
+	ReturnCode string   `xml:"return_code,omitempty"`
+	ReturnMsg  string   `xml:"return_msg,omitempty"`
+	ResultCode string   `xml:"result_code,omitempty"`
+	ErrCode    string   `xml:"err_code,omitempty"`
+	ErrCodeDes string   `xml:"err_code_des,omitempty"`
 }
 
 //ResAccessToken ResAccessToken
