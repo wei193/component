@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/wei193/component/base"
 )
 
 //卡券相关接口地址
@@ -186,13 +188,13 @@ func (wx *Wechat) CardCreate(card TACard) (cardid string, err error) {
 	param["access_token"] = wx.AccessToken
 
 	d, _ := json.Marshal(card)
-	req, err := http.NewRequest("POST", Param(URLCardCreate, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardCreate, param),
 		bytes.NewReader(d))
 	type st struct {
 		CardID string `json:"card_id"`
 	}
 	var data st
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		return "", err
 	}
@@ -217,10 +219,10 @@ func (wx *Wechat) CardPaycell(cardid string, isopen bool) (err error) {
 		IsOpen: isopen,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardPaycell, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardPaycell, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -241,10 +243,10 @@ func (wx *Wechat) CardSelfconsumecell(cardid string, isopen bool) (err error) {
 		IsOpen: isopen,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardSelfconsumecell, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardSelfconsumecell, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -269,10 +271,10 @@ func (wx *Wechat) CardSingleQrcode(card TScanCard) (err error) {
 		},
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardQrcode, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardQrcode, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -298,10 +300,10 @@ func (wx *Wechat) CardMultipleQrcode(cards []TScanCard) (err error) {
 		},
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardQrcode, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardQrcode, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -324,10 +326,10 @@ func (wx *Wechat) CardCodeGet(code string, cardid string, checkConsume bool) (er
 		CheckConsume: checkConsume,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardCodeGet, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardCodeGet, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -348,10 +350,10 @@ func (wx *Wechat) CardUserGetcardlist(openid string, cardid string) (err error) 
 		CardID: cardid,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardUserGetcardlist, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardUserGetcardlist, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -370,10 +372,10 @@ func (wx *Wechat) CardGet(cardid string) (err error) {
 		CardID: cardid,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardGet, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardGet, param),
 		bytes.NewReader(d))
 
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -396,10 +398,10 @@ func (wx *Wechat) CardBatchget(statusList []string, offset, count int) (err erro
 		StatusList: statusList,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param(URLCardBatchget, param),
+	req, err := http.NewRequest("POST", base.Param(URLCardBatchget, param),
 		bytes.NewReader(d))
 
-	body, err := requsetJSON(req, 0)
+	body, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}

@@ -13,6 +13,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/wei193/component/base"
 )
 
 //base url
@@ -308,13 +310,13 @@ func (wx *Wechat) SendAll(Tagid int, Msgtype, Content string) (sendData ResMsg, 
 
 	d, _ := json.Marshal(data)
 	log.Println(string(d))
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/message/mass/sendall", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/cgi-bin/message/mass/sendall", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return sendData, err
 	}
-	resp, err := requsetJSON(req, 0)
+	resp, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err, string(resp))
 		return sendData, err
@@ -380,13 +382,13 @@ func (wx *Wechat) SendList(userList []string, Msgtype, Content string) (sendData
 
 	d, _ := json.Marshal(data)
 	log.Println(string(d))
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/message/mass/send", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/cgi-bin/message/mass/send", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return sendData, err
 	}
-	resp, err := requsetJSON(req, 0)
+	resp, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return sendData, err
@@ -405,13 +407,13 @@ func (wx *Wechat) DeleteMsg(msgid string) int {
 	param["access_token"] = wx.AccessToken
 	t := STMediaid{msgid}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/message/mass/delete", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/cgi-bin/message/mass/delete", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -476,13 +478,13 @@ func (wx *Wechat) PreviewMsg(openid, wxname, Msgtype, Content string) int {
 	}
 
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/message/mass/preview", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/cgi-bin/message/mass/preview", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -497,13 +499,13 @@ func (wx *Wechat) SendMsg(data interface{}) int {
 
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST",
-		Param("https://api.weixin.qq.com/cgi-bin/message/custom/send", param),
+		base.Param("https://api.weixin.qq.com/cgi-bin/message/custom/send", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0

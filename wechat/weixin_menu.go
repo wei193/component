@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/wei193/component/base"
 )
 
 //base url
@@ -61,12 +63,12 @@ func (wx *Wechat) GetMenu() (data STMenus, err error) {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 
-	req, err := http.NewRequest("GET", Param(URLMENUGET, param), nil)
+	req, err := http.NewRequest("GET", base.Param(URLMENUGET, param), nil)
 	if err != nil {
 		log.Println(err)
 		return data, err
 	}
-	resp, err := requsetJSON(req, 0)
+	resp, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -90,13 +92,13 @@ func (wx *Wechat) CreatMenu(menu STMenu) int {
 	d = bytes.Replace(d, []byte("\\u003e"), []byte(">"), -1)
 	d = bytes.Replace(d, []byte("\\u003d"), []byte("="), -1)
 
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/menu/create", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/cgi-bin/menu/create", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -110,13 +112,13 @@ func (wx *Wechat) CreatConditionalMenu(menu STCondMenu) (string, error) {
 	param["access_token"] = wx.AccessToken
 
 	d, _ := json.Marshal(menu)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/cgi-bin/menu/addconditional", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/cgi-bin/menu/addconditional", param),
 		bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return "", err
 	}
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -143,12 +145,12 @@ func (wx *Wechat) DeleteConditionalMenu(menuid string) int {
 	}
 	temp := stTmp{menuid}
 	d, _ := json.Marshal(temp)
-	req, err := http.NewRequest("GET", Param("https://api.weixin.qq.com/cgi-bin/menu/delconditional", param), bytes.NewReader(d))
+	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/menu/delconditional", param), bytes.NewReader(d))
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -161,12 +163,12 @@ func (wx *Wechat) DeleteAllMenu() int {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 
-	req, err := http.NewRequest("GET", Param("https://api.weixin.qq.com/cgi-bin/menu/delete", param), nil)
+	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/menu/delete", param), nil)
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0

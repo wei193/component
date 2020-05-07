@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/wei193/component/base"
 )
 
 //STShakePage STShakePage
@@ -123,9 +125,9 @@ func (wx *Wechat) AddShakeDevice(quantity int, applyReason, comment string, poii
 	}
 	t := stTmp{quantity, applyReason, comment, poiid}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/device/applyid", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/device/applyid", param),
 		bytes.NewReader(d))
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return res
@@ -152,9 +154,9 @@ func (wx *Wechat) ChkeckShakeDevice(applyid int) (res ResShakeDevice) {
 	}
 	t := stTmp{applyid}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/device/applystatus", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/device/applystatus", param),
 		bytes.NewReader(d))
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return res
@@ -179,9 +181,9 @@ func (wx *Wechat) AddShakePage(title, description, pageurl, comment, iconurl str
 
 	t := STShakePage{0, title, description, pageurl, comment, iconurl}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/page/add", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/page/add", param),
 		bytes.NewReader(d))
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -202,9 +204,9 @@ func (wx *Wechat) UpdateShakePage(pageid int, title, description, pageurl, comme
 
 	t := STShakePage{pageid, title, description, pageurl, comment, iconurl}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/page/update", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/page/update", param),
 		bytes.NewReader(d))
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -232,9 +234,9 @@ func (wx *Wechat) SearchShakePage(typeid int, pageids []int, begin, count int) [
 
 	t := stTmp{typeid, pageids, begin, count}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/page/search", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/page/search", param),
 		bytes.NewReader(d))
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -261,9 +263,9 @@ func (wx *Wechat) DeleteShakePage(pageid int) int {
 
 	t := STShakePage{pageid, "", "", "", "", ""}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/page/delete", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/page/delete", param),
 		bytes.NewReader(d))
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -276,12 +278,12 @@ func (wx *Wechat) UploadShakeImage(mediaType, filepath string) string {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["type"] = mediaType
-	req, err := newfileUploadRequest(Param("https://api.weixin.qq.com/shakearound/material/add", param), nil,
+	req, err := newfileUploadRequest(base.Param("https://api.weixin.qq.com/shakearound/material/add", param), nil,
 		"media", filepath)
 	if err != nil {
 		return ""
 	}
-	resBody, err := requsetJSON(req, 0)
+	resBody, err := base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -308,13 +310,13 @@ func (wx *Wechat) SetLotterySwitch(lotteryid string, onoff int) int {
 	param["lottery_id"] = lotteryid
 	param["onoff"] = strconv.Itoa(onoff)
 
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/lottery/setlotteryswitch", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/lottery/setlotteryswitch", param),
 		nil)
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -336,13 +338,13 @@ func (wx *Wechat) applyid(quantity int, applyreason, comment, poiid string) int 
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 
-	req, err := http.NewRequest("POST", Param("https://api.weixin.qq.com/shakearound/device/applyid", param),
+	req, err := http.NewRequest("POST", base.Param("https://api.weixin.qq.com/shakearound/device/applyid", param),
 		bytes.NewReader(data))
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
-	_, err = requsetJSON(req, 0)
+	_, err = base.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
