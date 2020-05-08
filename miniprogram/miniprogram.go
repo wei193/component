@@ -125,7 +125,7 @@ func (mini *MiniProgram) Code2Session(code string) (s MiniSession, err error) {
 	param["secret"] = mini.Appsecret
 	param["js_code"] = code
 
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/token", param), nil)
+	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/sns/jscode2session", param), nil)
 
 	resBody, err := base.Requset(req)
 	if err != nil {
