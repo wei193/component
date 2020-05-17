@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //基础定义
@@ -103,7 +103,7 @@ func (wx *Wechat) SetMch(mchid, paykey, certpath, keypath, capath string) (err e
 		wx.Mch.MchID = mchid
 		wx.Mch.PayKey = paykey
 	}
-	wx.Mch._tlsConfig, err = base.GetTLSConfig(certpath, keypath, capath)
+	wx.Mch._tlsConfig, err = common.GetTLSConfig(certpath, keypath, capath)
 	return err
 }
 
@@ -117,9 +117,9 @@ func (wx *Wechat) GetAccessToken() (err error) {
 	param["appid"] = wx.Appid
 	param["secret"] = wx.Appsecret
 
-	req, err := http.NewRequest("GET", base.Param(URLTOKEN, param), nil)
+	req, err := http.NewRequest("GET", common.Param(URLTOKEN, param), nil)
 
-	resBody, err := base.RequsetJSON(req, -1)
+	resBody, err := common.RequsetJSON(req, -1)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -144,7 +144,7 @@ func (wx *Wechat) GetAccessToken() (err error) {
 func (wx *Wechat) CheckAccessToken() (err error) {
 	req, err := http.NewRequest("GET", URLGETCALLBACKIP+"?access_token="+
 		wx.AccessToken, nil)
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -156,12 +156,12 @@ func (wx *Wechat) GetJsapiTicket() (err error) {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["type"] = "jsapi"
-	req, err := http.NewRequest("GET", base.Param(URLGETTICKET, param), nil)
+	req, err := http.NewRequest("GET", common.Param(URLGETTICKET, param), nil)
 	if err != nil {
 		return err
 	}
 
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -190,7 +190,7 @@ func (wx *Wechat) CreateJsSignature(url, noncestr string, timestamp int64, data 
 	data["noncestr"] = noncestr
 	data["jsapi_ticket"] = wx.JsapiTicket
 	data["timestamp"] = strconv.FormatInt(timestamp, 10)
-	return base.SignSha1(data)
+	return common.SignSha1(data)
 }
 
 func (wx *Wechat) httpsRequsetXML(req *http.Request, tflag int, isXML ...bool) ([]byte, error) {
@@ -201,7 +201,7 @@ func (wx *Wechat) httpsRequsetXML(req *http.Request, tflag int, isXML ...bool) (
 	if len(isXML) == 1 && !isXML[0] {
 		return resBody, nil
 	}
-	var errcode base.XMLError
+	var errcode common.XMLError
 	err = xml.Unmarshal(resBody, &errcode)
 	if err != nil ||
 		errcode.ReturnCode != "SUCCESS" ||

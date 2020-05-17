@@ -14,7 +14,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //CheckResult 检查结果
@@ -42,10 +42,10 @@ func (mini *MiniProgram) ImgSecCheck(media string) (res CheckResult, err error) 
 	writer.Close()
 
 	req, err := http.NewRequest("POST",
-		base.Param("https://api.weixin.qq.com/wxa/img_sec_check", param),
+		common.Param("https://api.weixin.qq.com/wxa/img_sec_check", param),
 		body)
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return res, err
 	}
@@ -71,9 +71,9 @@ func (mini *MiniProgram) MediaCheckAsync(url string, typ int) (res CheckResult, 
 	rdata, _ := json.Marshal(tmp)
 
 	req, err := http.NewRequest("POST",
-		base.Param("https://api.weixin.qq.com/wxa/media_check_async", param),
+		common.Param("https://api.weixin.qq.com/wxa/media_check_async", param),
 		bytes.NewReader(rdata))
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return res, err
 	}
@@ -97,10 +97,10 @@ func (mini *MiniProgram) MsgSecCheck(content string) (res CheckResult, err error
 	rdata, _ := json.Marshal(tmp)
 
 	req, err := http.NewRequest("POST",
-		base.Param("https://api.weixin.qq.com/wxa/msg_sec_check", param),
+		common.Param("https://api.weixin.qq.com/wxa/msg_sec_check", param),
 		bytes.NewReader(rdata))
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return res, err
 	}

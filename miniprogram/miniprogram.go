@@ -1,34 +1,18 @@
 package miniprogram
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
+	"github.com/wei193/component/wechat"
 )
 
 //MiniProgram 小程序接口
 type MiniProgram struct {
-	Appid              string
-	Appsecret          string
-	Token              string
-	Encodingaeskey     string
-	AccessToken        string
-	AccessTokenExpires int64
-	Mch                *MchInfo
-}
-
-//MchInfo 微信商户信息
-type MchInfo struct {
-	MchID      string
-	PayKey     string
-	CertPath   string
-	KeyPath    string
-	CaPath     string
-	_tlsConfig *tls.Config
+	*wechat.Wechat
 }
 
 //AccessToken ResAccessToken
@@ -49,9 +33,9 @@ func (mini *MiniProgram) GetAccessToken() (err error) {
 	param["appid"] = mini.Appid
 	param["secret"] = mini.Appsecret
 
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/token", param), nil)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/cgi-bin/token", param), nil)
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return err
 	}
@@ -82,9 +66,9 @@ func (mini *MiniProgram) Getpaidunionid(openid, transactionid, outtradeno string
 		param["out_trade_no"] = outtradeno
 	}
 
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/token", param), nil)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/cgi-bin/token", param), nil)
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return "", err
 	}
@@ -125,9 +109,9 @@ func (mini *MiniProgram) Code2Session(code string) (s MiniSession, err error) {
 	param["secret"] = mini.Appsecret
 	param["js_code"] = code
 
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/sns/jscode2session", param), nil)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/sns/jscode2session", param), nil)
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return s, err
 	}

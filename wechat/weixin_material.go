@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //base url
@@ -102,12 +102,12 @@ func (wx *Wechat) AddTempMaterial(mediaType, filepath string) (data ReqMedia, er
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["type"] = mediaType
-	req, err := newfileUploadRequest(base.Param(URLMediaUpload, param), nil,
+	req, err := newfileUploadRequest(common.Param(URLMediaUpload, param), nil,
 		"media", filepath)
 	if err != nil {
 		return
 	}
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -126,7 +126,7 @@ func (wx *Wechat) GetTempMaterial(basepath, mediaid string) (string, error) {
 	param["access_token"] = wx.AccessToken
 	param["media_id"] = mediaid
 
-	req, err := http.NewRequest("GET", base.Param(URLMediaGet, param), nil)
+	req, err := http.NewRequest("GET", common.Param(URLMediaGet, param), nil)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -168,9 +168,9 @@ func (wx *Wechat) AddNews(news []TNews) (data ReqMedia, err error) {
 	}
 	t := articles{news}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", base.Param(URLMediaAddNews, param),
+	req, err := http.NewRequest("POST", common.Param(URLMediaAddNews, param),
 		bytes.NewReader(d))
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -196,9 +196,9 @@ func (wx *Wechat) UpdateNews(Mediaid string, Index int, news TNews) int {
 	}
 	t := articles{Mediaid, Index, news}
 	d, _ := json.Marshal(t)
-	req, err := http.NewRequest("POST", base.Param(URLMediaUpdateNews, param),
+	req, err := http.NewRequest("POST", common.Param(URLMediaUpdateNews, param),
 		bytes.NewReader(d))
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return 0
 	}
@@ -210,12 +210,12 @@ func (wx *Wechat) UploadImg(filepath string) (data ReqMedia, err error) {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 
-	req, err := newfileUploadRequest(base.Param(URLMediaUploadImg, param),
+	req, err := newfileUploadRequest(common.Param(URLMediaUploadImg, param),
 		nil, "media", filepath)
 	if err != nil {
 		return
 	}
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -234,12 +234,12 @@ func (wx *Wechat) AddMaterial(mediaType, filepath string) (data ReqMedia, err er
 	param["access_token"] = wx.AccessToken
 	param["type"] = mediaType
 
-	req, err := newfileUploadRequest(base.Param(URLMediaAddMaterial, param),
+	req, err := newfileUploadRequest(common.Param(URLMediaAddMaterial, param),
 		nil, "media", filepath)
 	if err != nil {
 		return
 	}
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -262,7 +262,7 @@ func (wx *Wechat) DelMaterial(mediaid string) int {
 	req, err := http.NewRequest("POST", URLMediaDelMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err == nil {
 		return 1
 	}
@@ -320,7 +320,7 @@ func (wx *Wechat) GetMaterialsNews(Type string, offset, count int) (data ResNews
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", URLMediaBatchgetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -344,7 +344,7 @@ func (wx *Wechat) GetMaterials(Type string, offset, count int) (data TMaterialLi
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", URLMediaBatchgetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err

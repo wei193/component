@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //base url
@@ -91,8 +91,8 @@ func GetUserInfoToken(accessToken, openid string) (userInfo STUserInfo, err erro
 	param["access_token"] = accessToken
 	param["openid"] = openid
 
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/sns/userinfo?lang=zh_CN", param), nil)
-	resBody, err := base.RequsetJSON(req, TOKENIGNORE)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/sns/userinfo?lang=zh_CN", param), nil)
+	resBody, err := common.RequsetJSON(req, TOKENIGNORE)
 	if err != nil {
 		log.Println(err)
 		return userInfo, err
@@ -113,11 +113,11 @@ func (wx *Wechat) GetUserToken(Code string) (uToken ResUserToken, err error) {
 	param["secret"] = wx.Appsecret
 	param["code"] = Code
 	param["grant_type"] = "authorization_code"
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/sns/oauth2/access_token", param), nil)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/sns/oauth2/access_token", param), nil)
 	if err != nil {
 		return uToken, err
 	}
-	resBody, err := base.RequsetJSON(req, 1)
+	resBody, err := common.RequsetJSON(req, 1)
 	if err != nil {
 		log.Println(err)
 		return uToken, err
@@ -136,8 +136,8 @@ func (wx *Wechat) GetUserInfoToken(accessToken, openid string) (userInfo STUserI
 	param["access_token"] = accessToken
 	param["openid"] = openid
 
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/sns/userinfo?lang=zh_CN", param), nil)
-	resBody, err := base.RequsetJSON(req, TOKENIGNORE)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/sns/userinfo?lang=zh_CN", param), nil)
+	resBody, err := common.RequsetJSON(req, TOKENIGNORE)
 	if err != nil {
 		log.Println(err)
 		return userInfo, err
@@ -156,8 +156,8 @@ func (wx *Wechat) GetUserInfo(openid string) (userInfo STUserInfo, err error) {
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["openid"] = openid
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/user/info?lang=zh_CN", param), nil)
-	resBody, err := base.RequsetJSON(req, 0)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/cgi-bin/user/info?lang=zh_CN", param), nil)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return userInfo, err
 	}
@@ -204,7 +204,7 @@ func (wx *Wechat) GetUsers100(openids []STOpenid) (userInfo []STUserInfo, err er
 	d, err := json.Marshal(t)
 
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token="+wx.AccessToken, bytes.NewReader(d))
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return userInfo, err
@@ -232,8 +232,8 @@ loop:
 	param := make(map[string]string)
 	param["access_token"] = wx.AccessToken
 	param["next_openid"] = nextOpenid
-	req, err := http.NewRequest("GET", base.Param("https://api.weixin.qq.com/cgi-bin/user/get", param), nil)
-	resBody, err := base.RequsetJSON(req, 0)
+	req, err := http.NewRequest("GET", common.Param("https://api.weixin.qq.com/cgi-bin/user/get", param), nil)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return openidList
@@ -267,7 +267,7 @@ func (wx *Wechat) CreateTag(name string) (tagid int, err error) {
 	d, _ := json.Marshal(t)
 	log.Println(string(d))
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/tags/create?access_token="+wx.AccessToken, bytes.NewReader(d))
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -286,7 +286,7 @@ func (wx *Wechat) GetTag() (data []STTag, err error) {
 		Tags []STTag `json:"tags"`
 	}
 	req, err := http.NewRequest("GET", "https://api.weixin.qq.com/cgi-bin/tags/get?access_token="+wx.AccessToken, nil)
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return data, err
@@ -308,7 +308,7 @@ func (wx *Wechat) UpdateTag(tagid int, name string) (err error) {
 	t := tags{STTag{tagid, name}}
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/tags/update?access_token="+wx.AccessToken, bytes.NewReader(d))
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	return err
 }
 
@@ -321,7 +321,7 @@ func (wx *Wechat) DelTags(tagid int) (err error) {
 	d, _ := json.Marshal(t)
 	log.Println(string(d))
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/tags/delete?access_token="+wx.AccessToken, bytes.NewReader(d))
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	return err
 }
 
@@ -332,7 +332,7 @@ func (wx *Wechat) GetUserTags(openid string) []int {
 	d, _ := json.Marshal(t)
 
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/tags/getidlist?access_token="+wx.AccessToken, bytes.NewReader(d))
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -359,7 +359,7 @@ func (wx *Wechat) BatchTags(openid []string, tagid int) int {
 	d, _ := json.Marshal(t)
 	log.Println(string(d))
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/tags/members/batchtagging?access_token="+wx.AccessToken, bytes.NewReader(d))
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -377,7 +377,7 @@ func (wx *Wechat) UnBatchTags(openid []string, tagid int) int {
 	t := stOpenid{openid, tagid}
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/tags/members/batchuntagging?access_token="+wx.AccessToken, bytes.NewReader(d))
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0
@@ -394,7 +394,7 @@ func (wx *Wechat) UpdateRemark(openid, remark string) int {
 	t := stRemark{openid, remark}
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", "https://api.weixin.qq.com/cgi-bin/user/info/updateremark?access_token="+wx.AccessToken, bytes.NewReader(d))
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
 		return 0

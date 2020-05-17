@@ -10,7 +10,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //卡券相关接口地址
@@ -188,13 +188,13 @@ func (wx *Wechat) CardCreate(card TACard) (cardid string, err error) {
 	param["access_token"] = wx.AccessToken
 
 	d, _ := json.Marshal(card)
-	req, err := http.NewRequest("POST", base.Param(URLCardCreate, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardCreate, param),
 		bytes.NewReader(d))
 	type st struct {
 		CardID string `json:"card_id"`
 	}
 	var data st
-	resBody, err := base.RequsetJSON(req, 0)
+	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return "", err
 	}
@@ -219,10 +219,10 @@ func (wx *Wechat) CardPaycell(cardid string, isopen bool) (err error) {
 		IsOpen: isopen,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardPaycell, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardPaycell, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -243,10 +243,10 @@ func (wx *Wechat) CardSelfconsumecell(cardid string, isopen bool) (err error) {
 		IsOpen: isopen,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardSelfconsumecell, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardSelfconsumecell, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -271,10 +271,10 @@ func (wx *Wechat) CardSingleQrcode(card TScanCard) (err error) {
 		},
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardQrcode, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardQrcode, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -300,10 +300,10 @@ func (wx *Wechat) CardMultipleQrcode(cards []TScanCard) (err error) {
 		},
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardQrcode, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardQrcode, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -326,10 +326,10 @@ func (wx *Wechat) CardCodeGet(code string, cardid string, checkConsume bool) (er
 		CheckConsume: checkConsume,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardCodeGet, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardCodeGet, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -350,10 +350,10 @@ func (wx *Wechat) CardUserGetcardlist(openid string, cardid string) (err error) 
 		CardID: cardid,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardUserGetcardlist, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardUserGetcardlist, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -372,10 +372,10 @@ func (wx *Wechat) CardGet(cardid string) (err error) {
 		CardID: cardid,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardGet, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardGet, param),
 		bytes.NewReader(d))
 
-	_, err = base.RequsetJSON(req, 0)
+	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}
@@ -398,10 +398,10 @@ func (wx *Wechat) CardBatchget(statusList []string, offset, count int) (err erro
 		StatusList: statusList,
 	}
 	d, _ := json.Marshal(data)
-	req, err := http.NewRequest("POST", base.Param(URLCardBatchget, param),
+	req, err := http.NewRequest("POST", common.Param(URLCardBatchget, param),
 		bytes.NewReader(d))
 
-	body, err := base.RequsetJSON(req, 0)
+	body, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
 	}

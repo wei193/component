@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //BankcardInfo 银行卡信息
@@ -38,10 +38,10 @@ func (mini *MiniProgram) Bankcard(media string) (info BankcardInfo, err error) {
 	writer.Close()
 
 	req, err := http.NewRequest("POST",
-		base.Param("https://api.weixin.qq.com/cv/ocr/bankcard", param),
+		common.Param("https://api.weixin.qq.com/cv/ocr/bankcard", param),
 		body)
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return info, err
 	}
@@ -62,10 +62,10 @@ func (mini *MiniProgram) BankcardByURL(url string) (info BankcardInfo, err error
 	param["img_url"] = url
 
 	req, err := http.NewRequest("POST",
-		base.Param("https://api.weixin.qq.com/cv/ocr/bankcard", param),
+		common.Param("https://api.weixin.qq.com/cv/ocr/bankcard", param),
 		nil)
 
-	resBody, err := base.Requset(req)
+	resBody, err := common.Requset(req)
 	if err != nil {
 		return info, err
 	}

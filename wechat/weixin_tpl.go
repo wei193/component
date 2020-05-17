@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/wei193/component/base"
+	"github.com/wei193/component/common"
 )
 
 //设置所属行业https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token=ACCESS_TOKEN
@@ -47,7 +47,7 @@ func (wx *Wechat) SendTemplate(data string) (string, error) {
 	}
 	req, err := http.NewRequest("POST", TEMPLATESENDURL+"?access_token="+
 		wx.AccessToken, bytes.NewReader(buf))
-	res, err := base.RequsetJSON(req, 0)
+	res, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +66,7 @@ func (wx *Wechat) SendTemplateToUser(touser, templateid, url string,
 	rdata, _ := json.Marshal(tpl)
 	req, err := http.NewRequest("POST", TEMPLATESENDURL+"?access_token="+
 		wx.AccessToken, bytes.NewReader(rdata))
-	res, err := base.RequsetJSON(req, 0)
+	res, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return "", err
 	}
