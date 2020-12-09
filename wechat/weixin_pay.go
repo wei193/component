@@ -89,6 +89,7 @@ type ResQueryOrder struct {
 	Mchid              string `xml:"mch_id,omitempty"`
 	NonceStr           string `xml:"nonce_str,omitempty"`
 	Sign               string `xml:"sign,omitempty"`
+	SignType           string `xml:"sign_type,omitempty"`
 	ResultCode         string `xml:"result_code,omitempty"`
 	ErrCode            string `xml:"err_code,omitempty"`
 	ErrCodeDes         string `xml:"err_code_des,omitempty"`
