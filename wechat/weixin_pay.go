@@ -368,6 +368,7 @@ func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		log.Println(data, wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -398,6 +399,7 @@ func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrd
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		log.Println(data, wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -425,6 +427,7 @@ func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) 
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		log.Println(data, wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -454,6 +457,7 @@ func (wx *Wechat) Refund(refund ReqRefund) (data ResRefund, err error) {
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		log.Println(data, wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -480,6 +484,7 @@ func (wx *Wechat) RefundQuery(refund ReqRefundquery) (data ResReqRefundquery, er
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
+		log.Println(data, wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
