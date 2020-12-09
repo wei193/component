@@ -87,16 +87,16 @@ type ResQueryOrder struct {
 	ReturnMsg          string `xml:"return_msg,omitempty"`
 	Appid              string `xml:"appid,omitempty"`
 	Mchid              string `xml:"mch_id,omitempty"`
-	DeviceInfo         string `xml:"device_info,omitempty"`
 	NonceStr           string `xml:"nonce_str,omitempty"`
 	Sign               string `xml:"sign,omitempty"`
-	SignType           string `xml:"sign_type,omitempty"`
 	ResultCode         string `xml:"result_code,omitempty"`
 	ErrCode            string `xml:"err_code,omitempty"`
 	ErrCodeDes         string `xml:"err_code_des,omitempty"`
+	DeviceInfo         string `xml:"device_info,omitempty"`
 	Openid             string `xml:"openid,omitempty"`
 	IsSubscribe        string `xml:"is_subscribe,omitempty"`
 	TradeType          string `xml:"trade_type,omitempty"`
+	TradeState         string `xml:"trade_state,omitempty"`
 	BankType           string `xml:"bank_type,omitempty"`
 	TotalFee           int    `xml:"total_fee,omitempty"`
 	SettlementTotalFee int    `xml:"settlement_total_fee,omitempty"`
@@ -105,11 +105,19 @@ type ResQueryOrder struct {
 	CashFeeType        string `xml:"cash_fee_type,omitempty"`
 	CouponFee          int    `xml:"coupon_fee,omitempty"`
 	CouponCount        int    `xml:"coupon_count,omitempty"`
+	CouponType0        int    `xml:"coupon_type_0,omitempty"`
+	CouponId0          int    `xml:"coupon_id_0,omitempty"`
+	CouponFee0         int    `xml:"coupon_fee_0,omitempty"`
+	CouponType1        int    `xml:"coupon_type_1,omitempty"`
+	CouponId1          int    `xml:"coupon_id_1,omitempty"`
+	CouponFee1         int    `xml:"coupon_fee_1,omitempty"`
+	CouponType2        int    `xml:"coupon_type_2,omitempty"`
+	CouponId2          int    `xml:"coupon_id_2,omitempty"`
+	CouponFee2         int    `xml:"coupon_fee_2,omitempty"`
 	Transactionid      string `xml:"transaction_id,omitempty"`
 	OutTradeNo         string `xml:"out_trade_no,omitempty"`
 	Attach             string `xml:"attach,omitempty"`
 	TimeEnd            string `xml:"time_end,omitempty"`
-	TradeState         string `xml:"trade_state,omitempty"`
 	TradeStateDesc     string `xml:"trade_state_desc,omitempty"`
 }
 
@@ -368,7 +376,7 @@ func (wx *Wechat) UnifiedOrder(order ReqUnifiedOrder) (data ResUnifiedOrder, err
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
-		log.Println(data, wx.Mch.PayKey)
+		log.Println(string(resBody), wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -399,7 +407,7 @@ func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrd
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
-		log.Println(data, wx.Mch.PayKey)
+		log.Println(string(resBody), wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -427,7 +435,7 @@ func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) 
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
-		log.Println(data, wx.Mch.PayKey)
+		log.Println(string(resBody), wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -457,7 +465,7 @@ func (wx *Wechat) Refund(refund ReqRefund) (data ResRefund, err error) {
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
-		log.Println(data, wx.Mch.PayKey)
+		log.Println(string(resBody), wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
@@ -484,7 +492,7 @@ func (wx *Wechat) RefundQuery(refund ReqRefundquery) (data ResReqRefundquery, er
 	Sign := data.Sign
 	data.Sign = ""
 	if common.XMLSignMd5(data, wx.Mch.PayKey) != Sign {
-		log.Println(data, wx.Mch.PayKey)
+		log.Println(string(resBody), wx.Mch.PayKey)
 		return data, errors.New("签名错误")
 	}
 	return data, nil
