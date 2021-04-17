@@ -36,7 +36,7 @@ type Template struct {
 	Touser     string                  `json:"touser"`
 	Templateid string                  `json:"template_id"`
 	URL        string                  `json:"url"`
-	Data       map[string]TemplateData `json:"data,json"`
+	Data       map[string]TemplateData `json:"data"`
 }
 
 //SendTemplate 发送模板消息https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN

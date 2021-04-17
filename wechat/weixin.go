@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -68,6 +69,7 @@ type Wechat struct {
 	JsapiTicket        string
 	JsapiTokenTime     int64
 	JsapiTokenExpires  int64
+	AuthorizedDomain   string
 	Mch                *MchInfo
 }
 
@@ -82,12 +84,13 @@ type MchInfo struct {
 }
 
 //New 创建wechat
-func New(Appid, Appsecret, Token, Encodingaeskey string) *Wechat {
+func New(Appid, Appsecret, Token, Encodingaeskey, AuthorizedDomain string) *Wechat {
 	wx := &Wechat{
-		Appid:          Appid,
-		Appsecret:      Appsecret,
-		Token:          Token,
-		Encodingaeskey: Encodingaeskey,
+		Appid:            Appid,
+		Appsecret:        Appsecret,
+		Token:            Token,
+		Encodingaeskey:   Encodingaeskey,
+		AuthorizedDomain: AuthorizedDomain,
 	}
 	return wx
 }
@@ -118,7 +121,9 @@ func (wx *Wechat) GetAccessToken() (err error) {
 	param["secret"] = wx.Appsecret
 
 	req, err := http.NewRequest("GET", common.Param(URLTOKEN, param), nil)
-
+	if err == nil {
+		return err
+	}
 	resBody, err := common.RequsetJSON(req, -1)
 	if err != nil {
 		log.Println(err)
@@ -144,6 +149,9 @@ func (wx *Wechat) GetAccessToken() (err error) {
 func (wx *Wechat) CheckAccessToken() (err error) {
 	req, err := http.NewRequest("GET", URLGETCALLBACKIP+"?access_token="+
 		wx.AccessToken, nil)
+	if err == nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -239,6 +247,24 @@ func (wx *Wechat) httpsPost(url string, xmlContent []byte, ContentType string) (
 	return client.Post(url,
 		ContentType,
 		bytes.NewBuffer(xmlContent))
+}
+
+//GetRedirectUri 获取登录连接
+func (wx *Wechat) GetDefaultRedirectUri(path, scope, state string) string {
+	return wx.GetRedirectUri(wx.AuthorizedDomain+path, scope, state)
+}
+
+//GetRedirectUri 获取登录连接
+func (wx *Wechat) GetRedirectUri(uri, scope, state string) string {
+	var tpl, _ = url.Parse("https://open.weixin.qq.com/connect/oauth2/authorize")
+	params := url.Values{}
+	params.Add("appid", wx.Appid)
+	params.Add("redirect_uri", uri)
+	params.Add("response_type", "code")
+	params.Add("scope", scope)
+	params.Add("state", state)
+	tpl.RawQuery = params.Encode()
+	return tpl.String()
 }
 
 //DecodeRequest 解析请求

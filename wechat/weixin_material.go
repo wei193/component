@@ -127,6 +127,9 @@ func (wx *Wechat) GetTempMaterial(basepath, mediaid string) (string, error) {
 	param["media_id"] = mediaid
 
 	req, err := http.NewRequest("GET", common.Param(URLMediaGet, param), nil)
+	if err != nil {
+		return "", err
+	}
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -170,6 +173,10 @@ func (wx *Wechat) AddNews(news []TNews) (data ReqMedia, err error) {
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", common.Param(URLMediaAddNews, param),
 		bytes.NewReader(d))
+	if err != nil {
+		log.Println(err)
+		return data, err
+	}
 	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
@@ -198,6 +205,9 @@ func (wx *Wechat) UpdateNews(Mediaid string, Index int, news TNews) int {
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", common.Param(URLMediaUpdateNews, param),
 		bytes.NewReader(d))
+	if err != nil {
+		return 0
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return 0
@@ -261,7 +271,9 @@ func (wx *Wechat) DelMaterial(mediaid string) int {
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", URLMediaDelMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
-
+	if err == nil {
+		return 1
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err == nil {
 		return 1
@@ -278,6 +290,9 @@ func (wx *Wechat) GetMaterial(basepath, mediaid string) (string, error) {
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", URLMediaGetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
+	if err == nil {
+		return "", err
+	}
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -320,6 +335,9 @@ func (wx *Wechat) GetMaterialsNews(Type string, offset, count int) (data ResNews
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", URLMediaBatchgetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
+	if err == nil {
+		return data, err
+	}
 	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
@@ -344,6 +362,9 @@ func (wx *Wechat) GetMaterials(Type string, offset, count int) (data TMaterialLi
 	d, _ := json.Marshal(t)
 	req, err := http.NewRequest("POST", URLMediaBatchgetMaterial+"?access_token="+
 		wx.AccessToken, bytes.NewReader(d))
+	if err == nil {
+		return data, err
+	}
 	resBody, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		log.Println(err)
@@ -407,7 +428,9 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 		return nil, err
 	}
 	_, err = io.Copy(part, file)
-
+	if err == nil {
+		return nil, err
+	}
 	for key, val := range params {
 		_ = writer.WriteField(key, val)
 	}

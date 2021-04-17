@@ -190,6 +190,9 @@ func (wx *Wechat) CardCreate(card TACard) (cardid string, err error) {
 	d, _ := json.Marshal(card)
 	req, err := http.NewRequest("POST", common.Param(URLCardCreate, param),
 		bytes.NewReader(d))
+	if err != nil {
+		return "", err
+	}
 	type st struct {
 		CardID string `json:"card_id"`
 	}
@@ -221,7 +224,9 @@ func (wx *Wechat) CardPaycell(cardid string, isopen bool) (err error) {
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardPaycell, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -245,7 +250,9 @@ func (wx *Wechat) CardSelfconsumecell(cardid string, isopen bool) (err error) {
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardSelfconsumecell, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -273,7 +280,9 @@ func (wx *Wechat) CardSingleQrcode(card TScanCard) (err error) {
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardQrcode, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -302,7 +311,9 @@ func (wx *Wechat) CardMultipleQrcode(cards []TScanCard) (err error) {
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardQrcode, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -328,7 +339,9 @@ func (wx *Wechat) CardCodeGet(code string, cardid string, checkConsume bool) (er
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardCodeGet, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -352,7 +365,9 @@ func (wx *Wechat) CardUserGetcardlist(openid string, cardid string) (err error) 
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardUserGetcardlist, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -374,7 +389,9 @@ func (wx *Wechat) CardGet(cardid string) (err error) {
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardGet, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	_, err = common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
@@ -400,7 +417,9 @@ func (wx *Wechat) CardBatchget(statusList []string, offset, count int) (err erro
 	d, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", common.Param(URLCardBatchget, param),
 		bytes.NewReader(d))
-
+	if err != nil {
+		return err
+	}
 	body, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return err
