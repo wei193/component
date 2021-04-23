@@ -249,7 +249,7 @@ func RequsetJSON(req *http.Request, tflag int) ([]byte, error) {
 	if err == nil && errcode.Errcode != 0 {
 		return resBody, errors.New(string(resBody))
 	}
-	return resBody, nil
+	return resBody, err
 }
 
 //RequsetXML 发送微信请求
@@ -279,6 +279,9 @@ func Requset(req *http.Request) ([]byte, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status + http.StatusText(resp.StatusCode))
 	}
 	defer resp.Body.Close()
 	return ioutil.ReadAll(resp.Body)

@@ -396,6 +396,9 @@ func (wx *Wechat) QueryOrder(transactionid, outTradeNo string) (data ResQueryOrd
 	queryOrder.Sign = common.XMLSignMd5(queryOrder, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
 	req, err := http.NewRequest("POST", URLPAYORDERQUERY, bytes.NewReader(d))
+	if err != nil {
+		return data, err
+	}
 	resBody, err := common.RequsetXML(req, -1)
 	if err != nil {
 		log.Println(err)
@@ -424,6 +427,9 @@ func (wx *Wechat) CloseOrder(outTradeNo string) (data ResCloseOrder, err error) 
 	queryOrder.Sign = common.XMLSignMd5(queryOrder, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(queryOrder, "", "\t")
 	req, err := http.NewRequest("POST", URLPAYCLOSEORDER, bytes.NewReader(d))
+	if err != nil {
+		return data, err
+	}
 	resBody, err := common.RequsetXML(req, -1)
 	if err != nil {
 		log.Println(err)
@@ -452,6 +458,9 @@ func (wx *Wechat) Refund(refund ReqRefund) (data ResRefund, err error) {
 		return data, err
 	}
 	req, err := http.NewRequest("POST", URLPAYREFUND, bytes.NewReader(d))
+	if err != nil {
+		return data, err
+	}
 	resBody, err := wx.httpsRequsetXML(req, -1)
 	if err != nil {
 		if resBody != nil {
@@ -482,6 +491,9 @@ func (wx *Wechat) RefundQuery(refund ReqRefundquery) (data ResReqRefundquery, er
 		return data, err
 	}
 	req, err := http.NewRequest("POST", URLPAYREFUNDQUERY, bytes.NewReader(d))
+	if err != nil {
+		return data, err
+	}
 	resBody, err := common.RequsetXML(req, -1)
 	if err != nil {
 		return data, err
@@ -510,6 +522,9 @@ func (wx *Wechat) Downloadbill(billDate string, billType string) (data string, e
 	queryBill.Sign = common.XMLSignMd5(queryBill, wx.Mch.PayKey)
 	d, _ := xml.MarshalIndent(queryBill, "", "\t")
 	req, err := http.NewRequest("POST", URLDOWNLOADBILL, bytes.NewReader(d))
+	if err != nil {
+		return data, err
+	}
 	resBody, err := common.RequsetXML(req, -1, false)
 	if err != nil {
 		log.Println(err)
@@ -532,7 +547,7 @@ func (wx *Wechat) SendHongbao(hb ReqHongbao) (resp ResHongbao, err error) {
 		return resp, err
 	}
 	resBody := make([]byte, 1024)
-	res.Body.Read(resBody)
+	// res.Body.Read(resBody)
 	err = xml.Unmarshal(resBody, &resp)
 	if err != nil {
 		return resp, err

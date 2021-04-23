@@ -47,6 +47,9 @@ func (wx *Wechat) SendTemplate(data string) (string, error) {
 	}
 	req, err := http.NewRequest("POST", TEMPLATESENDURL+"?access_token="+
 		wx.AccessToken, bytes.NewReader(buf))
+	if err != nil {
+		return "", err
+	}
 	res, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return "", err
@@ -66,6 +69,9 @@ func (wx *Wechat) SendTemplateToUser(touser, templateid, url string,
 	rdata, _ := json.Marshal(tpl)
 	req, err := http.NewRequest("POST", TEMPLATESENDURL+"?access_token="+
 		wx.AccessToken, bytes.NewReader(rdata))
+	if err != nil {
+		return "", err
+	}
 	res, err := common.RequsetJSON(req, 0)
 	if err != nil {
 		return "", err
