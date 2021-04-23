@@ -32,7 +32,7 @@ func requsetJosn(req *http.Request) ([]byte, error) {
 	}
 	var errcode JSONError
 	err = json.Unmarshal(res, &errcode)
-	if err == nil && errcode.Errcode != 0 {
+	if err != nil || errcode.Errcode != 0 {
 		return res, errors.New(string(res))
 	}
 	return res, err

@@ -246,7 +246,7 @@ func RequsetJSON(req *http.Request, tflag int) ([]byte, error) {
 	}
 	var errcode JSONError
 	err = json.Unmarshal(resBody, &errcode)
-	if err == nil && errcode.Errcode != 0 {
+	if err != nil || errcode.Errcode != 0 {
 		return resBody, errors.New(string(resBody))
 	}
 	return resBody, err

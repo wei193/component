@@ -121,7 +121,7 @@ func (wx *Wechat) GetAccessToken() (err error) {
 	param["secret"] = wx.Appsecret
 
 	req, err := http.NewRequest("GET", common.Param(URLTOKEN, param), nil)
-	if err == nil {
+	if err != nil {
 		return err
 	}
 	resBody, err := common.RequsetJSON(req, -1)
@@ -149,7 +149,7 @@ func (wx *Wechat) GetAccessToken() (err error) {
 func (wx *Wechat) CheckAccessToken() (err error) {
 	req, err := http.NewRequest("GET", URLGETCALLBACKIP+"?access_token="+
 		wx.AccessToken, nil)
-	if err == nil {
+	if err != nil {
 		return err
 	}
 	_, err = common.RequsetJSON(req, 0)
